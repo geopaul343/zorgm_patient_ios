@@ -1,0 +1,517 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A1234567890123456789012A /* ZorgamIOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789012B /* ZorgamIOSApp.swift */; };
+		A1234567890123456789012C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789012D /* ContentView.swift */; };
+		A1234567890123456789012E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789012F /* Assets.xcassets */; };
+		A1234567890123456789012G /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789012H /* Preview Assets.xcassets */; };
+		A1234567890123456789013A /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013B /* SessionManager.swift */; };
+		A1234567890123456789013C /* NavigationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013D /* NavigationManager.swift */; };
+		A1234567890123456789013E /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013F /* APIService.swift */; };
+		A1234567890123456789013G /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013H /* User.swift */; };
+		A1234567890123456789013I /* HealthAssessment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013J /* HealthAssessment.swift */; };
+		A1234567890123456789013K /* HealthSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013L /* HealthSummary.swift */; };
+		A1234567890123456789013M /* Medication.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013N /* Medication.swift */; };
+		A1234567890123456789013O /* AssessmentsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013P /* AssessmentsViewModel.swift */; };
+		A1234567890123456789013Q /* AssessmentDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013R /* AssessmentDetailViewModel.swift */; };
+		A1234567890123456789013S /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013T /* DashboardViewModel.swift */; };
+		A1234567890123456789013U /* MedicationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013V /* MedicationsViewModel.swift */; };
+		A1234567890123456789013W /* WelcomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013X /* WelcomeViewModel.swift */; };
+		A1234567890123456789013Y /* AssessmentDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013Z /* AssessmentDetailView.swift */; };
+		A1234567890123456789014A /* AssessmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789014B /* AssessmentsView.swift */; };
+		A1234567890123456789014C /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789014D /* DashboardView.swift */; };
+		A1234567890123456789014E /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789014F /* MainTabView.swift */; };
+		A1234567890123456789014G /* MedicationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789014H /* MedicationsView.swift */; };
+		A1234567890123456789014I /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789014J /* SettingsView.swift */; };
+		A1234567890123456789014K /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789014L /* WelcomeView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A1234567890123456789012B /* ZorgamIOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZorgamIOSApp.swift; sourceTree = "<group>"; };
+		A1234567890123456789012D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A1234567890123456789012F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A1234567890123456789012H /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		A1234567890123456789012I /* ZorgamIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZorgamIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1234567890123456789013B /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
+		A1234567890123456789013D /* NavigationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationManager.swift; sourceTree = "<group>"; };
+		A1234567890123456789013F /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
+		A1234567890123456789013H /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		A1234567890123456789013J /* HealthAssessment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthAssessment.swift; sourceTree = "<group>"; };
+		A1234567890123456789013L /* HealthSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthSummary.swift; sourceTree = "<group>"; };
+		A1234567890123456789013N /* Medication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Medication.swift; sourceTree = "<group>"; };
+		A1234567890123456789013P /* AssessmentsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentsViewModel.swift; sourceTree = "<group>"; };
+		A1234567890123456789013R /* AssessmentDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentDetailViewModel.swift; sourceTree = "<group>"; };
+		A1234567890123456789013T /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
+		A1234567890123456789013V /* MedicationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicationsViewModel.swift; sourceTree = "<group>"; };
+		A1234567890123456789013X /* WelcomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewModel.swift; sourceTree = "<group>"; };
+		A1234567890123456789013Z /* AssessmentDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentDetailView.swift; sourceTree = "<group>"; };
+		A1234567890123456789014B /* AssessmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentsView.swift; sourceTree = "<group>"; };
+		A1234567890123456789014D /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		A1234567890123456789014F /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		A1234567890123456789014H /* MedicationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicationsView.swift; sourceTree = "<group>"; };
+		A1234567890123456789014J /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A1234567890123456789014L /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A1234567890123456789012J /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A1234567890123456789012K /* ZorgamIOS */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890123456789012B /* ZorgamIOSApp.swift */,
+				A1234567890123456789012D /* ContentView.swift */,
+				A1234567890123456789014M /* Core */,
+				A1234567890123456789014N /* ViewModels */,
+				A1234567890123456789014O /* Views */,
+				A1234567890123456789012F /* Assets.xcassets */,
+				A1234567890123456789012L /* Preview Content */,
+			);
+			path = ZorgamIOS;
+			sourceTree = "<group>";
+		};
+		A1234567890123456789012L /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890123456789012H /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		A1234567890123456789012M /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890123456789012I /* ZorgamIOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A1234567890123456789012N = {
+			isa = PBXGroup;
+			children = (
+				A1234567890123456789012K /* ZorgamIOS */,
+				A1234567890123456789012M /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A1234567890123456789014M /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890123456789014P /* Models */,
+				A1234567890123456789014Q /* Services */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		A1234567890123456789014N /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890123456789013P /* AssessmentsViewModel.swift */,
+				A1234567890123456789013R /* AssessmentDetailViewModel.swift */,
+				A1234567890123456789013T /* DashboardViewModel.swift */,
+				A1234567890123456789013V /* MedicationsViewModel.swift */,
+				A1234567890123456789013X /* WelcomeViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		A1234567890123456789014O /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890123456789014R /* Assessments */,
+				A1234567890123456789014S /* Dashboard */,
+				A1234567890123456789014T /* Main */,
+				A1234567890123456789014U /* Medications */,
+				A1234567890123456789014V /* Settings */,
+				A1234567890123456789014W /* Welcome */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A1234567890123456789014P /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890123456789013H /* User.swift */,
+				A1234567890123456789013J /* HealthAssessment.swift */,
+				A1234567890123456789013L /* HealthSummary.swift */,
+				A1234567890123456789013N /* Medication.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A1234567890123456789014Q /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890123456789013B /* SessionManager.swift */,
+				A1234567890123456789013D /* NavigationManager.swift */,
+				A1234567890123456789013F /* APIService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		A1234567890123456789014R /* Assessments */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890123456789013Z /* AssessmentDetailView.swift */,
+				A1234567890123456789014B /* AssessmentsView.swift */,
+			);
+			path = Assessments;
+			sourceTree = "<group>";
+		};
+		A1234567890123456789014S /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890123456789014D /* DashboardView.swift */,
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
+		A1234567890123456789014T /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890123456789014F /* MainTabView.swift */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		A1234567890123456789014U /* Medications */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890123456789014H /* MedicationsView.swift */,
+			);
+			path = Medications;
+			sourceTree = "<group>";
+		};
+		A1234567890123456789014V /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890123456789014J /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		A1234567890123456789014W /* Welcome */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890123456789014L /* WelcomeView.swift */,
+			);
+			path = Welcome;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A1234567890123456789012O /* ZorgamIOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1234567890123456789012P /* Build configuration list for PBXNativeTarget "ZorgamIOS" */;
+			buildPhases = (
+				A1234567890123456789012Q /* Sources */,
+				A1234567890123456789012J /* Frameworks */,
+				A1234567890123456789012R /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ZorgamIOS;
+			productName = ZorgamIOS;
+			productReference = A1234567890123456789012I /* ZorgamIOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A1234567890123456789012S /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1640;
+				TargetAttributes = {
+					A1234567890123456789012O = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = A1234567890123456789012T /* Build configuration list for PBXProject "ZorgamIOS" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A1234567890123456789012N;
+			productRefGroup = A1234567890123456789012M /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A1234567890123456789012O /* ZorgamIOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A1234567890123456789012R /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1234567890123456789012G /* Preview Assets.xcassets in Resources */,
+				A1234567890123456789012E /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A1234567890123456789012Q /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1234567890123456789012C /* ContentView.swift in Sources */,
+				A1234567890123456789012A /* ZorgamIOSApp.swift in Sources */,
+				A1234567890123456789013A /* SessionManager.swift in Sources */,
+				A1234567890123456789013C /* NavigationManager.swift in Sources */,
+				A1234567890123456789013E /* APIService.swift in Sources */,
+				A1234567890123456789013G /* User.swift in Sources */,
+				A1234567890123456789013I /* HealthAssessment.swift in Sources */,
+				A1234567890123456789013K /* HealthSummary.swift in Sources */,
+				A1234567890123456789013M /* Medication.swift in Sources */,
+				A1234567890123456789013O /* AssessmentsViewModel.swift in Sources */,
+				A1234567890123456789013Q /* AssessmentDetailViewModel.swift in Sources */,
+				A1234567890123456789013S /* DashboardViewModel.swift in Sources */,
+				A1234567890123456789013U /* MedicationsViewModel.swift in Sources */,
+				A1234567890123456789013W /* WelcomeViewModel.swift in Sources */,
+				A1234567890123456789013Y /* AssessmentDetailView.swift in Sources */,
+				A1234567890123456789014A /* AssessmentsView.swift in Sources */,
+				A1234567890123456789014C /* DashboardView.swift in Sources */,
+				A1234567890123456789014E /* MainTabView.swift in Sources */,
+				A1234567890123456789014G /* MedicationsView.swift in Sources */,
+				A1234567890123456789014I /* SettingsView.swift in Sources */,
+				A1234567890123456789014K /* WelcomeView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A1234567890123456789012U /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = BBLMDGUH4Y;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A1234567890123456789012V /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = BBLMDGUH4Y;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A1234567890123456789012W /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"ZorgamIOS/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.geo.zorgam.ZorgamIOS;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A1234567890123456789012X /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"ZorgamIOS/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.geo.zorgam.ZorgamIOS;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A1234567890123456789012P /* Build configuration list for PBXNativeTarget "ZorgamIOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1234567890123456789012W /* Debug */,
+				A1234567890123456789012X /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1234567890123456789012T /* Build configuration list for PBXProject "ZorgamIOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1234567890123456789012U /* Debug */,
+				A1234567890123456789012V /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A1234567890123456789012S /* Project object */;
+}
