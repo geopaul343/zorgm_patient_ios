@@ -12,6 +12,7 @@ class NavigationManager: ObservableObject {
         case dashboard = "Dashboard"
         case assessments = "Assessments"
         case medications = "Medications"
+        case history = "History"
         case settings = "Settings"
         
         var icon: String {
@@ -19,6 +20,7 @@ class NavigationManager: ObservableObject {
             case .dashboard: return "house.fill"
             case .assessments: return "checkmark.circle.fill"
             case .medications: return "pills.fill"
+            case .history: return "clock.arrow.circlepath"
             case .settings: return "gear"
             }
         }
@@ -36,6 +38,10 @@ class NavigationManager: ObservableObject {
     
     func navigateToMedications() {
         selectedTab = .medications
+    }
+    
+    func navigateToHistory() {
+        selectedTab = .history
     }
     
     func navigateToSettings() {

@@ -43,11 +43,11 @@ class APIService: ObservableObject {
     
     // MARK: - Health Summary
     func getHealthSummary() -> AnyPublisher<HealthSummary, APIError> {
-        return performRequest(endpoint: "/health/summary", method: "GET", body: EmptyRequest())
+        return performRequest(endpoint: "/health/summary", method: "GET")
     }
     
     func getWeatherData() -> AnyPublisher<WeatherData, APIError> {
-        return performRequest(endpoint: "/weather", method: "GET", body: EmptyRequest())
+        return performRequest(endpoint: "/weather", method: "GET")
     }
     
     // MARK: - Generic Request Method
