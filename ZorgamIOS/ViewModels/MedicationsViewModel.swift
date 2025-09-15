@@ -34,6 +34,7 @@ class MedicationsViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
+    @MainActor
     func addMedication(_ request: AddMedicationRequest) {
         apiService.addMedication(request)
             .receive(on: DispatchQueue.main)
@@ -54,6 +55,7 @@ class MedicationsViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
+    @MainActor
     func updateMedication(_ medication: Medication, with request: AddMedicationRequest) {
         apiService.updateMedication(id: medication.id, medication: request)
             .receive(on: DispatchQueue.main)
@@ -76,6 +78,7 @@ class MedicationsViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
+    @MainActor
     func deleteMedication(_ medication: Medication) {
         apiService.deleteMedication(id: medication.id)
             .receive(on: DispatchQueue.main)

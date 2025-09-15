@@ -16,7 +16,7 @@ class APIService: ObservableObject {
     
     // MARK: - Health Assessments
     func getHealthAssessment(type: AssessmentType) -> AnyPublisher<HealthAssessmentResponse, APIError> {
-        return performRequest(endpoint: "/assessments/\(type.rawValue.lowercased())", method: "GET", body: EmptyRequest())
+        return performGetRequest<HealthAssessmentResponse>(endpoint: "/assessments/\(type.rawValue.lowercased())")
     }
     
     func submitAssessment(type: AssessmentType, answers: [String: String]) -> AnyPublisher<AssessmentResult, APIError> {
@@ -26,7 +26,7 @@ class APIService: ObservableObject {
     
     // MARK: - Medications
     func getMedications() -> AnyPublisher<[Medication], APIError> {
-        return performRequest(endpoint: "/medications", method: "GET", body: EmptyRequest())
+        return performGetRequest<[Medication]>(endpoint: "/medications")
     }
     
     func addMedication(_ medication: AddMedicationRequest) -> AnyPublisher<MedicationResponse, APIError> {
@@ -38,19 +38,113 @@ class APIService: ObservableObject {
     }
     
     func deleteMedication(id: Int) -> AnyPublisher<APIResponse, APIError> {
-        return performRequest(endpoint: "/medications/\(id)", method: "DELETE", body: EmptyRequest())
+        return performDeleteRequest<APIResponse>(endpoint: "/medications/\(id)")
     }
     
     // MARK: - Health Summary
     func getHealthSummary() -> AnyPublisher<HealthSummary, APIError> {
-        return performRequest(endpoint: "/health/summary", method: "GET")
+        return performGetRequest<HealthSummary>(endpoint: "/health/summary")
     }
     
     func getWeatherData() -> AnyPublisher<WeatherData, APIError> {
-        return performRequest(endpoint: "/weather", method: "GET")
+        return performGetRequest<WeatherData>(endpoint: "/weather")
     }
     
-    // MARK: - Generic Request Method
+    // MARK: - Generic Request Methods
+    private func performGetRequest<R: Codable>(endpoint: String) -> AnyPublisher<R, APIError> {
+        guard let url = URL(string: baseURL + endpoint) else {
+            return Fail(error: APIError.invalidURL)
+                .eraseToAnyPublisher()
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // Add auth token if available
+        if let token = SessionManager().authToken {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        
+        return session.dataTaskPublisher(for: request)
+            .tryMap { data, response -> Data in
+                // Check HTTP status code
+                if let httpResponse = response as? HTTPURLResponse {
+                    switch httpResponse.statusCode {
+                    case 200...299:
+                        break // Success
+                    case 401:
+                        throw APIError.serverError("Invalid username or password")
+                    case 400:
+                        throw APIError.serverError("Invalid request format")
+                    case 500:
+                        throw APIError.serverError("Server error. Please try again later")
+                    default:
+                        throw APIError.serverError("Request failed: \(httpResponse.statusCode)")
+                    }
+                }
+                return data
+            }
+            .decode(type: R.self, decoder: JSONDecoder())
+            .mapError { error in
+                if let apiError = error as? APIError {
+                    return apiError
+                } else if error is DecodingError {
+                    return APIError.decodingError
+                } else {
+                    return APIError.networkError(error.localizedDescription)
+                }
+            }
+            .eraseToAnyPublisher()
+    }
+    
+    private func performDeleteRequest<R: Codable>(endpoint: String) -> AnyPublisher<R, APIError> {
+        guard let url = URL(string: baseURL + endpoint) else {
+            return Fail(error: APIError.invalidURL)
+                .eraseToAnyPublisher()
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // Add auth token if available
+        if let token = SessionManager().authToken {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        
+        return session.dataTaskPublisher(for: request)
+            .tryMap { data, response -> Data in
+                // Check HTTP status code
+                if let httpResponse = response as? HTTPURLResponse {
+                    switch httpResponse.statusCode {
+                    case 200...299:
+                        break // Success
+                    case 401:
+                        throw APIError.serverError("Invalid username or password")
+                    case 400:
+                        throw APIError.serverError("Invalid request format")
+                    case 500:
+                        throw APIError.serverError("Server error. Please try again later")
+                    default:
+                        throw APIError.serverError("Request failed: \(httpResponse.statusCode)")
+                    }
+                }
+                return data
+            }
+            .decode(type: R.self, decoder: JSONDecoder())
+            .mapError { error in
+                if let apiError = error as? APIError {
+                    return apiError
+                } else if error is DecodingError {
+                    return APIError.decodingError
+                } else {
+                    return APIError.networkError(error.localizedDescription)
+                }
+            }
+            .eraseToAnyPublisher()
+    }
+    
     private func performRequest<T: Codable, R: Codable>(
         endpoint: String,
         method: String,

@@ -1,4 +1,4 @@
-import Foundation
+
 
 // MARK: - Health Summary Models
 struct HealthSummary: Codable {
@@ -42,6 +42,7 @@ struct WeatherData: Codable {
     let temperature: Double
     let humidity: Double
     let condition: String
+    let windSpeed: Double
     let location: String
     let timestamp: String
 }
