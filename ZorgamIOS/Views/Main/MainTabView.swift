@@ -1,30 +1,5 @@
 import SwiftUI
 
-// MARK: - Temporary History View (until file is added to Xcode project)
-struct HistoryView: View {
-    var body: some View {
-        NavigationView {
-            VStack(spacing: 20) {
-                Image(systemName: "clock.arrow.circlepath")
-                    .font(.system(size: 60))
-                    .foregroundColor(.blue)
-                
-                Text("History")
-                    .font(.title)
-                    .fontWeight(.bold)
-                
-                Text("Your activity history will appear here")
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .navigationTitle("History")
-            .navigationBarTitleDisplayMode(.large)
-        }
-    }
-}
-
 // MARK: - Main Tab View
 struct MainTabView: View {
     // MARK: - Environment Objects
@@ -83,3 +58,4 @@ struct MainTabView: View {
         .environmentObject(NavigationManager())
         .environmentObject(SessionManager())
 }
+

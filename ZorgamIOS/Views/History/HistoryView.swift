@@ -7,11 +7,38 @@ struct HistoryView: View {
     
     // MARK: - State Properties
     @StateObject private var viewModel = HistoryViewModel()
+    @State private var selectedFilter: FilterType = .daily // 👈 default filter
     
     // MARK: - Body
     var body: some View {
         NavigationView {
             VStack {
+                
+                // Filter Buttons
+                HStack(spacing: 12) {
+                    ForEach(FilterType.allCases, id: \.self) { filter in
+                        Button {
+                            selectedFilter = filter
+                            Task {
+                                await viewModel.loadHistory(for: filter)
+                            }
+                        } label: {
+                            Text(filter.rawValue.capitalized)
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                                .frame(width: 70, height: 70)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(selectedFilter == filter ? Color.blue.opacity(0.2) : Color.gray.opacity(0.1))
+                                )
+                                .foregroundColor(selectedFilter == filter ? .blue : .primary)
+                        }
+                    }
+                }
+                .padding(.vertical, 8)
+                
+                Divider()
+                
                 if viewModel.isLoading {
                     ProgressView("Loading history...")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)

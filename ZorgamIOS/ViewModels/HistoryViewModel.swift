@@ -1,5 +1,11 @@
 import Foundation
 import Combine
+import SwiftUI
+
+// MARK: - Filter Type Enum
+enum FilterType: String, CaseIterable {
+    case daily, weekly, monthly, onetime
+}
 
 // MARK: - History View Model
 class HistoryViewModel: ObservableObject {
@@ -14,70 +20,157 @@ class HistoryViewModel: ObservableObject {
     
     // MARK: - Public Methods
     @MainActor
-    func loadHistory() async {
+    func loadHistory(for filter: FilterType = .daily) async {
         isLoading = true
         errorMessage = nil
         
         // For now, we'll use mock data since the API doesn't have a history endpoint yet
         // In the future, you can replace this with actual API calls
-        await loadMockHistory()
+        await loadMockHistory(for: filter)
     }
     
-    private func loadMockHistory() async {
+    @MainActor
+    func loadHistory() async {
+        await loadHistory(for: .daily)
+    }
+    
+    private func loadMockHistory(for filter: FilterType = .daily) async {
         // Simulate network delay
-        try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
+        try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 second
         
-        // Mock history data
-        let mockItems = [
-            HistoryItem(
-                id: "1",
-                title: "Health Assessment Completed",
-                description: "General health assessment",
-                timestamp: Date().addingTimeInterval(-3600), // 1 hour ago
-                icon: "checkmark.circle.fill",
-                color: .green,
-                status: "Completed"
-            ),
-            HistoryItem(
-                id: "2",
-                title: "Medication Added",
-                description: "Added Metformin 500mg",
-                timestamp: Date().addingTimeInterval(-7200), // 2 hours ago
-                icon: "pills.fill",
-                color: .blue,
-                status: "Success"
-            ),
-            HistoryItem(
-                id: "3",
-                title: "Assessment Started",
-                description: "Blood pressure assessment",
-                timestamp: Date().addingTimeInterval(-10800), // 3 hours ago
-                icon: "heart.fill",
-                color: .red,
-                status: "In Progress"
-            ),
-            HistoryItem(
-                id: "4",
-                title: "Profile Updated",
-                description: "Updated personal information",
-                timestamp: Date().addingTimeInterval(-86400), // 1 day ago
-                icon: "person.fill",
-                color: .purple,
-                status: "Completed"
-            ),
-            HistoryItem(
-                id: "5",
-                title: "Medication Reminder",
-                description: "Metformin reminder sent",
-                timestamp: Date().addingTimeInterval(-172800), // 2 days ago
-                icon: "bell.fill",
-                color: .orange,
-                status: "Sent"
-            )
-        ]
+        // Mock history data based on filter
+        let mockItems = getMockData(for: filter)
         
         historyItems = mockItems
         isLoading = false
+    }
+    
+    private func getMockData(for filter: FilterType) -> [HistoryItem] {
+        switch filter {
+        case .daily:
+            return [
+                HistoryItem(
+                    id: "daily_1",
+                    title: "Morning Check-in",
+                    description: "Daily health assessment completed",
+                    timestamp: Date().addingTimeInterval(-3600), // 1 hour ago
+                    icon: "sun.max.fill",
+                    color: .orange,
+                    status: "Completed"
+                ),
+                HistoryItem(
+                    id: "daily_2",
+                    title: "Medication Taken",
+                    description: "Metformin 500mg taken",
+                    timestamp: Date().addingTimeInterval(-7200), // 2 hours ago
+                    icon: "pills.fill",
+                    color: .blue,
+                    status: "Success"
+                ),
+                HistoryItem(
+                    id: "daily_3",
+                    title: "Exercise Logged",
+                    description: "30 minutes walking recorded",
+                    timestamp: Date().addingTimeInterval(-10800), // 3 hours ago
+                    icon: "figure.walk",
+                    color: .green,
+                    status: "Completed"
+                )
+            ]
+            
+        case .weekly:
+            return [
+                HistoryItem(
+                    id: "weekly_1",
+                    title: "Weekly Health Report",
+                    description: "Summary of the past 7 days",
+                    timestamp: Date().addingTimeInterval(-86400), // 1 day ago
+                    icon: "chart.bar.fill",
+                    color: .blue,
+                    status: "Generated"
+                ),
+                HistoryItem(
+                    id: "weekly_2",
+                    title: "Medication Review",
+                    description: "Weekly medication adherence check",
+                    timestamp: Date().addingTimeInterval(-172800), // 2 days ago
+                    icon: "pills.circle.fill",
+                    color: .purple,
+                    status: "Completed"
+                ),
+                HistoryItem(
+                    id: "weekly_3",
+                    title: "Progress Update",
+                    description: "Health goals progress review",
+                    timestamp: Date().addingTimeInterval(-259200), // 3 days ago
+                    icon: "target",
+                    color: .green,
+                    status: "On Track"
+                )
+            ]
+            
+        case .monthly:
+            return [
+                HistoryItem(
+                    id: "monthly_1",
+                    title: "Monthly Health Assessment",
+                    description: "Comprehensive monthly health review",
+                    timestamp: Date().addingTimeInterval(-604800), // 1 week ago
+                    icon: "calendar.badge.checkmark",
+                    color: .green,
+                    status: "Completed"
+                ),
+                HistoryItem(
+                    id: "monthly_2",
+                    title: "Doctor Consultation",
+                    description: "Monthly checkup with Dr. Smith",
+                    timestamp: Date().addingTimeInterval(-1209600), // 2 weeks ago
+                    icon: "stethoscope",
+                    color: .blue,
+                    status: "Scheduled"
+                ),
+                HistoryItem(
+                    id: "monthly_3",
+                    title: "Lab Results",
+                    description: "Blood test results received",
+                    timestamp: Date().addingTimeInterval(-1814400), // 3 weeks ago
+                    icon: "testtube.2",
+                    color: .red,
+                    status: "Available"
+                )
+            ]
+            
+        case .onetime:
+            return [
+                HistoryItem(
+                    id: "onetime_1",
+                    title: "Initial Health Setup",
+                    description: "First-time health profile creation",
+                    timestamp: Date().addingTimeInterval(-2592000), // 1 month ago
+                    icon: "person.badge.plus",
+                    color: .purple,
+                    status: "Completed"
+                ),
+                HistoryItem(
+                    id: "onetime_2",
+                    title: "Emergency Contact Added",
+                    description: "Emergency contact information updated",
+                    timestamp: Date().addingTimeInterval(-3456000), // 1.5 months ago
+                    icon: "phone.circle.fill",
+                    color: .orange,
+                    status: "Updated"
+                ),
+                HistoryItem(
+                    id: "onetime_3",
+                    title: "Privacy Settings",
+                    description: "Data privacy preferences configured",
+                    timestamp: Date().addingTimeInterval(-4320000), // 2 months ago
+                    icon: "lock.shield.fill",
+                    color: .gray,
+                    status: "Configured"
+                )
+            ]
+        }
     }
     
     func refreshHistory() {
