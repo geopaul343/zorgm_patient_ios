@@ -43,7 +43,8 @@ class APIService: ObservableObject {
     
     // MARK: - Health Summary
     func getHealthSummary() -> AnyPublisher<HealthSummary, APIError> {
-        return performGetRequest<HealthSummary>(endpoint: "/health/summary")
+        print("🌐 Making API call to: \(baseURL)/dashboard/health-summary")
+        return performGetRequest<HealthSummary>(endpoint: "/dashboard/health-summary")
     }
     
     func getWeatherData() -> AnyPublisher<WeatherData, APIError> {
@@ -53,6 +54,7 @@ class APIService: ObservableObject {
     // MARK: - Generic Request Methods
     private func performGetRequest<R: Codable>(endpoint: String) -> AnyPublisher<R, APIError> {
         guard let url = URL(string: baseURL + endpoint) else {
+            print("❌ Invalid URL: \(baseURL + endpoint)")
             return Fail(error: APIError.invalidURL)
                 .eraseToAnyPublisher()
         }
@@ -64,29 +66,44 @@ class APIService: ObservableObject {
         // Add auth token if available
         if let token = SessionManager().authToken {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            print("🔑 Using auth token for request")
+        } else {
+            print("⚠️ No auth token available")
         }
         
         return session.dataTaskPublisher(for: request)
             .tryMap { data, response -> Data in
+                print("📡 API Response received for endpoint: \(endpoint)")
                 // Check HTTP status code
                 if let httpResponse = response as? HTTPURLResponse {
+                    print("📊 HTTP Status Code: \(httpResponse.statusCode)")
                     switch httpResponse.statusCode {
                     case 200...299:
+                        print("✅ API call successful")
                         break // Success
                     case 401:
+                        print("❌ Unauthorized - Invalid credentials")
                         throw APIError.serverError("Invalid username or password")
                     case 400:
+                        print("❌ Bad Request - Invalid request format")
                         throw APIError.serverError("Invalid request format")
                     case 500:
+                        print("❌ Server Error")
                         throw APIError.serverError("Server error. Please try again later")
                     default:
+                        print("❌ Request failed with status: \(httpResponse.statusCode)")
                         throw APIError.serverError("Request failed: \(httpResponse.statusCode)")
                     }
+                }
+                print("📦 Response data size: \(data.count) bytes")
+                if let responseString = String(data: data, encoding: .utf8) {
+                    print("📄 Response content: \(responseString)")
                 }
                 return data
             }
             .decode(type: R.self, decoder: JSONDecoder())
             .mapError { error in
+                print("❌ Decoding error: \(error)")
                 if let apiError = error as? APIError {
                     return apiError
                 } else if error is DecodingError {
