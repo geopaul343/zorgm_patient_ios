@@ -132,6 +132,7 @@
 		A1234567890123456789014O /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				EC2781952E794B40005C237F /* New Group */,
 				A1234567890123456789014R /* Assessments */,
 				A1234567890123456789014S /* Dashboard */,
 				A1234567890123456789014T /* Main */,
@@ -210,6 +211,13 @@
 				A1234567890123456789014L /* WelcomeView.swift */,
 			);
 			path = Welcome;
+			sourceTree = "<group>";
+		};
+		EC2781952E794B40005C237F /* New Group */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "New Group";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

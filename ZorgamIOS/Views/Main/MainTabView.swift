@@ -1,6 +1,6 @@
 import SwiftUI
 
-// MARK: - Temporary History View (until files are added to Xcode project)
+// MARK: - Temporary History View (until file is added to Xcode project)
 struct HistoryView: View {
     var body: some View {
         NavigationView {
