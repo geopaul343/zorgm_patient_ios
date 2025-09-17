@@ -4,6 +4,7 @@ import Combine
 // MARK: - Monthly Assessment View
 struct MonthlyAssessmentView: View {
     @StateObject private var apiService = APIService()
+    @EnvironmentObject private var navigationManager: NavigationManager
     @State private var questionnaires: [Questionnaire] = []
     @State private var answers: [String: String] = [:]
     @State private var isLoading = false
@@ -12,30 +13,79 @@ struct MonthlyAssessmentView: View {
     @State private var showSuccessAlert = false
     @State private var showErrorAlert = false
     
+    // Question flow state
+    @State private var currentQuestionIndex = 0
+    @State private var allQuestions: [QuestionnaireQuestion] = []
+    
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             if isLoading {
                 ProgressView("Loading monthly assessment...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if questionnaires.isEmpty {
+            } else if allQuestions.isEmpty {
                 EmptyStateView(
                     icon: "calendar",
                     title: "No Monthly Assessment",
                     message: "Unable to load monthly assessment questions."
                 )
             } else {
-                ScrollView {
-                    LazyVStack(spacing: 20) {
-                        ForEach(questionnaires) { questionnaire in
-                            QuestionnaireCard(
-                                questionnaire: questionnaire,
-                                answers: $answers
+                // Progress Header
+                VStack(spacing: 16) {
+                    // Progress Bar
+                    ProgressView(value: Double(currentQuestionIndex + 1), total: Double(allQuestions.count))
+                        .progressViewStyle(LinearProgressViewStyle(tint: .blue))
+                        .scaleEffect(x: 1, y: 2, anchor: .center)
+                    
+                    // Question Counter
+                    HStack {
+                        Text("Question \(currentQuestionIndex + 1) of \(allQuestions.count)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Text("Monthly Check-in")
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundColor(.blue)
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 10)
+                .padding(.bottom, 20)
+                
+                // Question Content
+                if currentQuestionIndex < allQuestions.count {
+                        QuestionStepView(
+                            question: allQuestions[currentQuestionIndex],
+                            questionIndex: currentQuestionIndex,
+                            answer: Binding(
+                                get: { answers[allQuestions[currentQuestionIndex].key] ?? "" },
+                                set: { answers[allQuestions[currentQuestionIndex].key] = $0 }
                             )
+                        )
+                    .padding(.horizontal, 20)
+                }
+                
+                Spacer()
+                
+                // Navigation Buttons
+                HStack(spacing: 16) {
+                    // Previous Button
+                    Button(action: previousQuestion) {
+                        HStack {
+                            Image(systemName: "chevron.left")
+                            Text("Previous")
                         }
-                        
-                        // Submit Button
-                        Button(action: submitAnswers) {
-                            HStack {
+                        .foregroundColor(currentQuestionIndex > 0 ? .blue : .gray)
+                        .fontWeight(.medium)
+                    }
+                    .disabled(currentQuestionIndex == 0)
+                    
+                    Spacer()
+                    
+                    // Next/Submit Button
+                    Button(action: nextQuestion) {
+                        HStack {
+                            if currentQuestionIndex == allQuestions.count - 1 {
                                 if isSubmitting {
                                     ProgressView()
                                         .progressViewStyle(CircularProgressViewStyle(tint: .white))
@@ -43,22 +93,27 @@ struct MonthlyAssessmentView: View {
                                 } else {
                                     Image(systemName: "checkmark.circle.fill")
                                 }
-                                Text(isSubmitting ? "Submitting..." : "Submit Assessment")
-                                    .fontWeight(.semibold)
+                                Text(isSubmitting ? "Submitting..." : "Submit")
+                            } else {
+                                Text("Next")
+                                Image(systemName: "chevron.right")
                             }
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(isSubmitting ? Color.gray : Color.purple)
-                            .cornerRadius(12)
                         }
-                        .disabled(isSubmitting || !isFormValid)
-                        .opacity(isFormValid ? 1.0 : 0.6)
-                        .padding(.horizontal)
-                        .padding(.bottom, 20)
+                        .foregroundColor(.white)
+                        .fontWeight(.semibold)
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 12)
+                        .background(
+                            isCurrentQuestionAnswered ? 
+                            (isSubmitting ? Color.gray : Color.blue) : 
+                            Color.gray.opacity(0.3)
+                        )
+                        .cornerRadius(25)
                     }
-                    .padding(.top)
+                    .disabled(!isCurrentQuestionAnswered || isSubmitting)
                 }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 30)
             }
         }
         .onAppear {
@@ -66,8 +121,9 @@ struct MonthlyAssessmentView: View {
         }
         .alert("Success", isPresented: $showSuccessAlert) {
             Button("OK") {
-                // Reset form or navigate back
+                // Reset form and navigate to dashboard
                 answers.removeAll()
+                navigationManager.navigateToTab(.dashboard)
             }
         } message: {
             Text("Your monthly assessment has been submitted successfully!")
@@ -77,19 +133,50 @@ struct MonthlyAssessmentView: View {
         } message: {
             Text(errorMessage ?? "Failed to submit assessment. Please try again.")
         }
+        .onTapGesture {
+            // Hide keyboard when tapping anywhere
+            hideKeyboard()
+        }
     }
     
-           private var isFormValid: Bool {
-               // Check if all required questions are answered
-               for questionnaire in questionnaires {
-                   for question in questionnaire.questions {
-                       if question.isRequired && answers[question.key]?.isEmpty != false {
-                           return false
-                       }
-                   }
-               }
-               return !questionnaires.isEmpty
-           }
+    // MARK: - Computed Properties
+    private var isCurrentQuestionAnswered: Bool {
+        guard currentQuestionIndex < allQuestions.count else { return false }
+        let currentQuestion = allQuestions[currentQuestionIndex]
+        let answer = answers[currentQuestion.key] ?? ""
+        return !answer.isEmpty
+    }
+    
+    private var isFormValid: Bool {
+        // Check if all required questions are answered
+        for question in allQuestions {
+            if question.isRequired && (answers[question.key]?.isEmpty ?? true) {
+                return false
+            }
+        }
+        return !allQuestions.isEmpty
+    }
+    
+    // MARK: - Navigation Methods
+    private func nextQuestion() {
+        if currentQuestionIndex == allQuestions.count - 1 {
+            // Last question - submit
+            submitAnswers()
+        } else {
+            // Move to next question
+            withAnimation(.easeInOut(duration: 0.3)) {
+                currentQuestionIndex += 1
+            }
+        }
+    }
+    
+    private func previousQuestion() {
+        if currentQuestionIndex > 0 {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                currentQuestionIndex -= 1
+            }
+        }
+    }
     
     private func loadQuestionnaire() {
         isLoading = true
@@ -107,7 +194,9 @@ struct MonthlyAssessmentView: View {
                 },
                 receiveValue: { questionnaires in
                     self.questionnaires = questionnaires
-                    print("✅ Loaded \(questionnaires.count) questionnaires")
+                    // Extract all questions and sort by sequence
+                    self.allQuestions = questionnaires.flatMap { $0.questions }.sorted { $0.sequence < $1.sequence }
+                    print("✅ Loaded \(questionnaires.count) questionnaires with \(self.allQuestions.count) questions")
                 }
             )
             .store(in: &cancellables)
@@ -144,4 +233,9 @@ struct MonthlyAssessmentView: View {
     }
     
     @State private var cancellables = Set<AnyCancellable>()
+    
+    // MARK: - Helper Functions
+    private func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
 }

@@ -279,6 +279,7 @@ class APIService: ObservableObject {
                 return data
             }
             .decode(type: R.self, decoder: JSONDecoder())
+        
             .mapError { error in
                 if let apiError = error as? APIError {
                     return apiError
