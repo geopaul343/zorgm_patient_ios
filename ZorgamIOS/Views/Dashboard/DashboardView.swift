@@ -39,6 +39,17 @@ struct DashboardView: View {
                                 )
                         }
                         
+                        // Test API Button (for debugging)
+                        Button("Test API") {
+                            Task {
+                                await viewModel.testAPI()
+                            }
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
                         
                     }
                     .padding(.horizontal)
@@ -89,27 +100,52 @@ struct DashboardView: View {
                     if let weather = viewModel.weather {
                         WeatherAirQualityCard(weather: weather, isLoading: viewModel.isLoading)
                     } else {
-                        // Show dummy data for weather
-                        WeatherAirQualityCard(weather: WeatherData(
-                            temperature: 72,
-                            humidity: 65,
-                            condition: "Sunny",
-                            windSpeed: 8.5,
-                            location: "London, UK",
-                            timestamp: ISO8601DateFormatter().string(from: Date()),
-                            airQuality: AirQuality(
-                                aqi: 45,
-                                pm25: 12.5,
-                                pm10: 18.2,
-                                o3: 0.08,
-                                no2: 0.02,
-                                co: 0.5,
-                                so2: 0.01,
-                                status: "Good"
-                            ),
-                            uvIndex: 6.5,
-                            visibility: 10.0
-                        ), isLoading: false)
+                        // Show loading state for air quality and pollen
+                        VStack(spacing: 20) {
+                            HStack {
+                                Text("Air Quality & Pollen")
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                
+                                Spacer()
+                                
+                                if viewModel.isLoading {
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle())
+                                        .scaleEffect(0.8)
+                                } else {
+                                    Text("Updated: \(formattedCurrentTime())")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            .padding(.horizontal)
+                            
+                            if viewModel.isLoading {
+                                VStack(spacing: 12) {
+                                    Text("Fetching latest air quality and pollen data...")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                    
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle())
+                                        .scaleEffect(1.2)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 40)
+                            } else {
+                                Text("No data available")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 40)
+                            }
+                        }
+                        .padding()
+                        .background(Color(.systemBackground))
+                        .cornerRadius(12)
+                        .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+                        .padding(.horizontal)
                     }
                     
                     // Quick Actions
@@ -144,6 +180,12 @@ struct DashboardView: View {
             Task {
                 await viewModel.loadData()
             }
+            // Start auto-refresh timer for weather data
+            viewModel.startAutoRefresh()
+        }
+        .onDisappear {
+            // Stop auto-refresh timer when view disappears
+            viewModel.stopAutoRefresh()
         }
     }
 }
@@ -323,47 +365,25 @@ struct WeatherAirQualityCard: View {
         VStack(spacing: 20) {
             // Header
             HStack {
-                Text("Weather & Air Quality")
+                Text("Air Quality & Pollen")
                     .font(.title2)
                     .fontWeight(.bold)
                 
                 Spacer()
                 
-                Text(weather.location)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
-            .padding(.horizontal)
-            
-            // Main Weather Info
-            HStack(spacing: 20) {
-                // Temperature and condition
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Image(systemName: weatherIcon(for: weather.condition))
-                            .font(.system(size: 32))
-                            .foregroundColor(weatherColor(for: weather.condition))
+                if isLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle())
+                        .scaleEffect(0.8)
+                } else {
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text("Updated: \(formattedDate(from: weather.timestamp))")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
                         
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("\(Int(weather.temperature))°C")
-                                .font(.title)
-                                .fontWeight(.bold)
-                            
-                            Text(weather.condition)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                }
-                
-                Spacer()
-                
-                // Additional weather details
-                VStack(alignment: .trailing, spacing: 8) {
-                    WeatherDetailItem(icon: "humidity.fill", value: "\(Int(weather.humidity))%", label: "Humidity", color: .blue)
-                    WeatherDetailItem(icon: "wind", value: "\(Int(weather.windSpeed)) km/h", label: "Wind", color: .green)
-                    if let uvIndex = weather.uvIndex {
-                        WeatherDetailItem(icon: "sun.max.fill", value: "\(Int(uvIndex))", label: "UV Index", color: .orange)
+                        Text(weather.location)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
                 }
             }
@@ -392,6 +412,46 @@ struct WeatherAirQualityCard: View {
                 }
                 .padding(.horizontal)
             }
+            
+            // Pollen Section
+            if let pollen = weather.pollen {
+                VStack(spacing: 12) {
+                    HStack {
+                        Text("Pollen Count")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                        
+                        Spacer()
+                        
+                        Text("Today")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    // Pollen Details
+                    HStack(spacing: 16) {
+                        PollenItem(
+                            label: "Grass",
+                            value: "\(pollen.grassPollen)",
+                            risk: pollen.grassPollenRisk,
+                            color: pollenColor(for: pollen.grassPollenRisk)
+                        )
+                        PollenItem(
+                            label: "Tree",
+                            value: "\(pollen.treePollen)",
+                            risk: pollen.treePollenRisk,
+                            color: pollenColor(for: pollen.treePollenRisk)
+                        )
+                        PollenItem(
+                            label: "Ragweed",
+                            value: "\(pollen.ragweedPollen)",
+                            risk: pollen.ragweedPollenRisk,
+                            color: pollenColor(for: pollen.ragweedPollenRisk)
+                        )
+                    }
+                }
+                .padding(.horizontal)
+            }
         }
         .padding()
         .background(Color(.systemBackground))
@@ -409,27 +469,6 @@ struct WeatherAirQualityCard: View {
     }
     
     // Helper functions
-    private func weatherIcon(for condition: String) -> String {
-        switch condition.lowercased() {
-        case "sunny", "clear": return "sun.max.fill"
-        case "cloudy": return "cloud.fill"
-        case "rainy", "rain": return "cloud.rain.fill"
-        case "snowy", "snow": return "cloud.snow.fill"
-        case "stormy", "storm": return "cloud.bolt.fill"
-        default: return "cloud.sun.fill"
-        }
-    }
-    
-    private func weatherColor(for condition: String) -> Color {
-        switch condition.lowercased() {
-        case "sunny", "clear": return .orange
-        case "cloudy": return .gray
-        case "rainy", "rain": return .blue
-        case "snowy", "snow": return .white
-        case "stormy", "storm": return .purple
-        default: return .blue
-        }
-    }
     
     private func airQualityColor(for value: Double) -> Color {
         switch value {
@@ -440,33 +479,18 @@ struct WeatherAirQualityCard: View {
         default: return .purple
         }
     }
-}
-
-// MARK: - Weather Detail Item
-struct WeatherDetailItem: View {
-    let icon: String
-    let value: String
-    let label: String
-    let color: Color
     
-    var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: icon)
-                .font(.caption)
-                .foregroundColor(color)
-            
-            VStack(alignment: .trailing, spacing: 2) {
-                Text(value)
-                    .font(.caption)
-                    .fontWeight(.semibold)
-                
-                Text(label)
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
+    private func pollenColor(for risk: String) -> Color {
+        switch risk.lowercased() {
+        case "low": return .green
+        case "moderate": return .yellow
+        case "high": return .orange
+        case "very high": return .red
+        default: return .gray
         }
     }
 }
+
 
 // MARK: - Air Quality Badge
 struct AirQualityBadge: View {
@@ -517,6 +541,33 @@ struct AirQualityItem: View {
             Text(label)
                 .font(.caption2)
                 .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+// MARK: - Pollen Item
+struct PollenItem: View {
+    let label: String
+    let value: String
+    let risk: String
+    let color: Color
+    
+    var body: some View {
+        VStack(spacing: 4) {
+            Text(value)
+                .font(.caption)
+                .fontWeight(.bold)
+                .foregroundColor(color)
+            
+            Text(label)
+                .font(.caption2)
+                .foregroundColor(.secondary)
+            
+            Text(risk)
+                .font(.caption2)
+                .fontWeight(.medium)
+                .foregroundColor(color)
         }
         .frame(maxWidth: .infinity)
     }
@@ -575,6 +626,23 @@ struct PointsCard: View {
     }
 }
 
+
+// MARK: - Helper Functions
+private func formattedCurrentTime() -> String {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "h:mm a"
+    return formatter.string(from: Date())
+}
+
+private func formattedDate(from timestamp: String) -> String {
+    let formatter = ISO8601DateFormatter()
+    if let date = formatter.date(from: timestamp) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "h:mm a"
+        return dateFormatter.string(from: date)
+    }
+    return "N/A"
+}
 
 // MARK: - Preview
 #Preview {

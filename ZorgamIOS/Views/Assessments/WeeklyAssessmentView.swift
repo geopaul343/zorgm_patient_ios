@@ -19,16 +19,16 @@ struct WeeklyAssessmentView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            if isLoading {
-                ProgressView("Loading weekly assessment...")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                if isLoading {
+                    ProgressView("Loading weekly assessment...")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if allQuestions.isEmpty {
-                EmptyStateView(
-                    icon: "chart.bar.fill",
-                    title: "No Weekly Assessment",
+                    EmptyStateView(
+                        icon: "chart.bar.fill",
+                        title: "No Weekly Assessment",
                     message: "Unable to load weekly assessment questions."
-                )
-            } else {
+                    )
+                } else {
                 // Progress Header
                 VStack(spacing: 16) {
                     // Progress Bar
@@ -140,7 +140,7 @@ struct WeeklyAssessmentView: View {
                 .padding(.bottom, 30)
             }
         }
-        .onAppear {
+            .onAppear {
             loadQuestionnaire()
         }
         .alert("Success", isPresented: $showSuccessAlert) {

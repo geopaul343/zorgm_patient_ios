@@ -35,6 +35,7 @@
 		A1234567890123456789015D /* WeeklyAssessmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015E /* WeeklyAssessmentView.swift */; };
 		A1234567890123456789015F /* MonthlyAssessmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015G /* MonthlyAssessmentView.swift */; };
 		A1234567890123456789015H /* Questionnaire.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015I /* Questionnaire.swift */; };
+		A1234567890123456789015J /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015K /* WeatherService.swift */; };
 		ECEE04812E795BB900429D35 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECEE047F2E795BB900429D35 /* HistoryView.swift */; };
 /* End PBXBuildFile section */
 
@@ -68,6 +69,7 @@
 		A1234567890123456789015E /* WeeklyAssessmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyAssessmentView.swift; sourceTree = "<group>"; };
 		A1234567890123456789015G /* MonthlyAssessmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyAssessmentView.swift; sourceTree = "<group>"; };
 		A1234567890123456789015I /* Questionnaire.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Questionnaire.swift; sourceTree = "<group>"; };
+		A1234567890123456789015K /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
 		ECEE047F2E795BB900429D35 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -174,6 +176,7 @@
 				A1234567890123456789013B /* SessionManager.swift */,
 				A1234567890123456789013D /* NavigationManager.swift */,
 				A1234567890123456789013F /* APIService.swift */,
+				A1234567890123456789015K /* WeatherService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -330,6 +333,7 @@
 				A1234567890123456789015D /* WeeklyAssessmentView.swift in Sources */,
 				A1234567890123456789015F /* MonthlyAssessmentView.swift in Sources */,
 				A1234567890123456789015H /* Questionnaire.swift in Sources */,
+				A1234567890123456789015J /* WeatherService.swift in Sources */,
 				A1234567890123456789014C /* DashboardView.swift in Sources */,
 				A1234567890123456789014E /* MainTabView.swift in Sources */,
 				A1234567890123456789014G /* MedicationsView.swift in Sources */,
@@ -478,6 +482,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app needs location access to provide accurate weather and air quality data for your area.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -508,6 +513,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app needs location access to provide accurate weather and air quality data for your area.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

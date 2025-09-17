@@ -12,7 +12,9 @@ class DashboardViewModel: ObservableObject {
     
     // MARK: - Private Properties
     private let apiService = APIService()
+    private let weatherService = WeatherService()
     private var cancellables = Set<AnyCancellable>()
+    private var refreshTimer: Timer?
     
     // MARK: - Public Methods
     @MainActor
@@ -33,6 +35,37 @@ class DashboardViewModel: ObservableObject {
     @MainActor
     func refreshData() async {
         await loadData()
+    }
+    
+    func startAutoRefresh() {
+        // Stop any existing timer
+        stopAutoRefresh()
+        
+        // Start new timer for every 5 minutes (300 seconds)
+        refreshTimer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                print("🔄 Auto-refreshing weather data...")
+                await self?.loadWeatherData()
+            }
+        }
+        print("⏰ Auto-refresh timer started (every 5 minutes)")
+    }
+    
+    func stopAutoRefresh() {
+        refreshTimer?.invalidate()
+        refreshTimer = nil
+        print("⏹️ Auto-refresh timer stopped")
+    }
+    
+    deinit {
+        stopAutoRefresh()
+    }
+    
+    // MARK: - Test API Method
+    @MainActor
+    func testAPI() async {
+        print("🧪 Manual API test triggered")
+        await loadWeatherData()
     }
     
     // MARK: - Private Methods
@@ -84,10 +117,67 @@ class DashboardViewModel: ObservableObject {
     
     @MainActor
     private func loadWeatherData() async {
-        // TODO: Replace with real API call when weather endpoint is available
-        // Example: apiService.getWeatherData()
-        // For now, always use mock data to ensure weather card shows
-        loadMockWeatherData()
+        print("🌤️ Loading weather data from API...")
+        
+        // Request location permission
+        weatherService.requestLocationPermission()
+        
+        // Start location updates
+        weatherService.startLocationUpdates()
+        
+        // Wait a moment for location to be available
+        try? await Task.sleep(nanoseconds: 3_000_000_000) // 3 seconds
+        
+        weatherService.getCurrentWeather()
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { [weak self] result in
+                    switch result {
+                    case .finished:
+                        print("✅ Weather API call completed successfully")
+                    case .failure(let error):
+                        print("❌ Weather API call failed: \(error.localizedDescription)")
+                        print("📍 Location permission status: \(self?.weatherService.locationPermissionStatus.rawValue ?? -1)")
+                        print("📍 Current location: \(self?.weatherService.currentLocation?.coordinate.latitude ?? 0), \(self?.weatherService.currentLocation?.coordinate.longitude ?? 0)")
+                        // Fallback to test API with fixed location if real location fails
+                        print("🔄 Falling back to test API with fixed location...")
+                        self?.testAPIWithFixedLocation()
+                    }
+                },
+                receiveValue: { [weak self] weather in
+                    print("🌤️ Weather data received: \(weather.location)")
+                    self?.weather = weather
+                }
+            )
+            .store(in: &cancellables)
+    }
+    
+    @MainActor
+    private func testAPIWithFixedLocation() {
+        // Test with San Francisco coordinates
+        let testLatitude = 37.7749
+        let testLongitude = -122.4194
+        
+        print("🧪 Testing API with San Francisco coordinates: \(testLatitude), \(testLongitude)")
+        
+        weatherService.testAPIWithCoordinates(latitude: testLatitude, longitude: testLongitude)
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { result in
+                    switch result {
+                    case .finished:
+                        print("✅ Test API call completed successfully")
+                    case .failure(let error):
+                        print("❌ Test API call failed: \(error.localizedDescription)")
+                    }
+                },
+                receiveValue: { [weak self] weather in
+                    print("🎉 Test API response received: \(weather.location)")
+                    // Use test data if real location fails
+                    self?.weather = weather
+                }
+            )
+            .store(in: &cancellables)
     }
     
     // MARK: - Future API Integration
@@ -116,13 +206,13 @@ class DashboardViewModel: ObservableObject {
     
     @MainActor
     private func loadMockWeatherData() {
-        // Provide mock weather data
+        // Provide mock air quality and pollen data only
         weather = WeatherData(
-            temperature: 72,
-            humidity: 65,
-            condition: "Sunny",
-            windSpeed: 8.5,
-            location: "London, UK",
+            temperature: 0, // Not used in UI
+            humidity: 0,    // Not used in UI
+            condition: "",  // Not used in UI
+            windSpeed: 0,   // Not used in UI
+            location: "Your Location",
             timestamp: ISO8601DateFormatter().string(from: Date()),
             airQuality: AirQuality(
                 aqi: 45,
@@ -134,8 +224,16 @@ class DashboardViewModel: ObservableObject {
                 so2: 0.01,
                 status: "Good"
             ),
-            uvIndex: 6.5,
-            visibility: 10.0
+            pollen: PollenData(
+                grassPollen: 0,
+                treePollen: 0,
+                ragweedPollen: 0,
+                grassPollenRisk: "Not Available",
+                treePollenRisk: "Not Available",
+                ragweedPollenRisk: "Not Available"
+            ),
+            uvIndex: nil,    // Not used in UI
+            visibility: nil  // Not used in UI
         )
     }
     

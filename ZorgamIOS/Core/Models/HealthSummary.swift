@@ -44,6 +44,7 @@ struct WeatherData: Codable {
     let location: String
     let timestamp: String
     let airQuality: AirQuality?
+    let pollen: PollenData?
     let uvIndex: Double?
     let visibility: Double?
 }
@@ -68,6 +69,15 @@ struct AirQuality: Codable {
         case so2
         case status
     }
+}
+
+struct PollenData: Codable {
+    let grassPollen: Int
+    let treePollen: Int
+    let ragweedPollen: Int
+    let grassPollenRisk: String
+    let treePollenRisk: String
+    let ragweedPollenRisk: String
 }
 
 // MARK: - Dashboard Stats
