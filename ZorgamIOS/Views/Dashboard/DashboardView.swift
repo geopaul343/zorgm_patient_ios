@@ -44,7 +44,95 @@ struct DashboardView: View {
                     
                     // Health Summary Card
                     if let summary = viewModel.healthSummary {
-                        HealthSummaryCard(summary: summary)
+                        HealthSummaryCard(summary: summary, isLoading: viewModel.isLoading)
+                    } else if viewModel.isLoading {
+                        // Show loading state
+                        VStack(spacing: 24) {
+                            Text("Health Summary")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal)
+                            
+                            ProgressView("Loading health data...")
+                                .progressViewStyle(CircularProgressViewStyle())
+                                .scaleEffect(1.2)
+                        }
+                        .padding()
+                        .background(Color(.systemBackground))
+                        .cornerRadius(12)
+                        .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+                        .padding(.horizontal)
+                    } else {
+                        // Show error state or empty state
+                        VStack(spacing: 16) {
+                            Text("Health Summary")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal)
+                            
+                            Text("Unable to load health data")
+                                .foregroundColor(.secondary)
+                                .padding()
+                        }
+                        .padding()
+                        .background(Color(.systemBackground))
+                        .cornerRadius(12)
+                        .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+                        .padding(.horizontal)
+                    }
+                    
+                    // Weather & Air Quality Card
+                    if let weather = viewModel.weather {
+                        WeatherAirQualityCard(weather: weather, isLoading: viewModel.isLoading)
+                    } else {
+                        // Show loading state for air quality and pollen
+                        VStack(spacing: 20) {
+                            HStack {
+                                Text("Air Quality & Pollen")
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                
+                                Spacer()
+                                
+                                if viewModel.isLoading {
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle())
+                                        .scaleEffect(0.8)
+                                } else {
+                                    Text("Updated: \(formattedCurrentTime())")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            .padding(.horizontal)
+                            
+                            if viewModel.isLoading {
+                                VStack(spacing: 12) {
+                                    Text("Fetching latest air quality and pollen data...")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                    
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle())
+                                        .scaleEffect(1.2)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 40)
+                            } else {
+                                Text("No data available")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 40)
+                            }
+                        }
+                        .padding()
+                        .background(Color(.systemBackground))
+                        .cornerRadius(12)
+                        .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+                        .padding(.horizontal)
                     }
                     
                     // Quick Actions
@@ -63,15 +151,9 @@ struct DashboardView: View {
                         }
                     )
                     
-                    // Weather Card
-                    if let weather = viewModel.weather {
-                        WeatherCard(weather: weather)
-                    }
+                    // Points Card - Last element in dashboard
+                    PointsCard(points: 1250)
                     
-                    // Stats Grid
-                    if let stats = viewModel.stats {
-                        StatsGridView(stats: stats)
-                    }
                 }
                 .padding(.bottom, 20)
             }
@@ -85,6 +167,12 @@ struct DashboardView: View {
             Task {
                 await viewModel.loadData()
             }
+            // Start auto-refresh timer for weather data
+            viewModel.startAutoRefresh()
+        }
+        .onDisappear {
+            // Stop auto-refresh timer when view disappears
+            viewModel.stopAutoRefresh()
         }
     }
 }
@@ -92,63 +180,84 @@ struct DashboardView: View {
 // MARK: - Health Summary Card
 struct HealthSummaryCard: View {
     let summary: HealthSummary
+    let isLoading: Bool
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Text("Health Summary")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                
-                Spacer()
-                
-                Text("Score: \(Int(summary.healthScore))")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.blue)
-            }
+        VStack(spacing: 24) {
             
-            HStack(spacing: 20) {
-                StatItem(
-                    title: "Completed",
-                    value: "\(summary.completedAssessments)",
-                    color: .green
-                )
-                
-                StatItem(
-                    title: "Pending",
-                    value: "\(summary.pendingAssessments)",
-                    color: .orange
-                )
-                
-                StatItem(
-                    title: "Total",
-                    value: "\(summary.totalAssessments)",
-                    color: .blue
-                )
-            }
+            // Heading
+            Text("Health Summary")
+                .font(.title2)
+                .fontWeight(.bold)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
             
-            if !summary.recommendations.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Recommendations")
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                    
-                    ForEach(summary.recommendations.prefix(2), id: \.self) { recommendation in
-                        Text("• \(recommendation)")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
-            }
+             // Row with 3 items (spaceBetween style)
+             HStack {
+                 SummaryItem(icon: "heart.fill", number: summary.weeklyProgress.daily, label: "Daily", color: .red)
+                 Spacer()
+                 SummaryItem(icon: "chart.bar.fill", number: summary.weeklyProgress.weekly, label: "Weekly", color: .blue)
+                 Spacer()
+                 SummaryItem(icon: "calendar", number: summary.weeklyProgress.monthly, label: "Monthly", color: .green)
+             }
+             .padding(.horizontal)
+             
+             // Total Submission in one row
+             HStack(spacing: 8) {
+                 Text("Total Submission")
+                     .font(.headline)
+                 Text("\(summary.totalCheckIns)")
+                     .font(.headline)
+                     .fontWeight(.bold)
+             }
+            .frame(maxWidth: .infinity, alignment: .center)
+            
         }
         .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
-        .padding(.horizontal)
+                    .background(Color(.systemBackground))
+                    .cornerRadius(12)
+                    .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+                    .padding(.horizontal)
+                    .blur(radius: isLoading ? 3 : 0) // blur content while loading
+                    
+                    // Loader overlay
+                    if isLoading {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle())
+                            .scaleEffect(1.5) // make it a bit larger
+                    }
     }
 }
+
+// MARK: - Summary Item
+struct SummaryItem: View {
+    let icon: String
+    let number: Int
+    let label: String
+    let color: Color
+    
+    var body: some View {
+        VStack(spacing: 6) {
+            ZStack {
+                Circle()
+                    .fill(color.opacity(0.15)) // light background color
+                    .frame(width: 48, height: 48)
+                Image(systemName: icon)
+                    .font(.system(size: 22))
+                    .foregroundColor(color)
+            }
+            
+            Text("\(number)")
+                .font(.title3)
+                .fontWeight(.semibold)
+            
+            Text(label)
+                .font(.caption)
+                .foregroundColor(.gray)
+        }
+    }
+}
+
 
 // MARK: - Quick Actions View
 struct QuickActionsView: View {
@@ -234,40 +343,101 @@ struct ActionButton: View {
     }
 }
 
-// MARK: - Weather Card
-struct WeatherCard: View {
+// MARK: - Weather & Air Quality Card
+struct WeatherAirQualityCard: View {
     let weather: WeatherData
+    let isLoading: Bool
     
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Current Weather")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                
-                Text(weather.location)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                
-                Text("\(Int(weather.temperature))°C")
-                    .font(.title)
+        VStack(spacing: 20) {
+            // Header
+            HStack {
+                Text("Air Quality & Pollen")
+                    .font(.title2)
                     .fontWeight(.bold)
+                
+                Spacer()
+                
+                if isLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle())
+                        .scaleEffect(0.8)
+                } else {
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text("Updated: \(formattedDate(from: weather.timestamp))")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        
+                        Text(weather.location)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+            .padding(.horizontal)
+            
+            // Air Quality Section
+            if let airQuality = weather.airQuality {
+                VStack(spacing: 12) {
+                    HStack {
+                        Text("Air Quality")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                        
+                        Spacer()
+                        
+                        AirQualityBadge(aqi: airQuality.aqi, status: airQuality.status)
+                    }
+                    
+                    // Air Quality Details
+                    HStack(spacing: 16) {
+                        AirQualityItem(label: "PM2.5", value: "\(Int(airQuality.pm25))", color: airQualityColor(for: airQuality.pm25))
+                        AirQualityItem(label: "PM10", value: "\(Int(airQuality.pm10))", color: airQualityColor(for: airQuality.pm10))
+                        AirQualityItem(label: "O₃", value: "\(Int(airQuality.o3 * 100))", color: airQualityColor(for: airQuality.o3 * 100))
+                        AirQualityItem(label: "NO₂", value: "\(Int(airQuality.no2 * 100))", color: airQualityColor(for: airQuality.no2 * 100))
+                    }
+                }
+                .padding(.horizontal)
             }
             
-            Spacer()
-            
-            VStack(alignment: .trailing, spacing: 4) {
-                Image(systemName: "cloud.sun.fill")
-                    .font(.title)
-                    .foregroundColor(.blue)
-                
-                Text(weather.condition)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                
-                Text("\(Int(weather.humidity))% humidity")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
+            // Pollen Section
+            if let pollen = weather.pollen {
+                VStack(spacing: 12) {
+                    HStack {
+                        Text("Pollen Count")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                        
+                        Spacer()
+                        
+                        Text("Today")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    // Pollen Details
+                    HStack(spacing: 16) {
+                        PollenItem(
+                            label: "Grass",
+                            value: "\(pollen.grassPollen)",
+                            risk: pollen.grassPollenRisk,
+                            color: pollenColor(for: pollen.grassPollenRisk)
+                        )
+                        PollenItem(
+                            label: "Tree",
+                            value: "\(pollen.treePollen)",
+                            risk: pollen.treePollenRisk,
+                            color: pollenColor(for: pollen.treePollenRisk)
+                        )
+                        PollenItem(
+                            label: "Ragweed",
+                            value: "\(pollen.ragweedPollen)",
+                            risk: pollen.ragweedPollenRisk,
+                            color: pollenColor(for: pollen.ragweedPollenRisk)
+                        )
+                    }
+                }
+                .padding(.horizontal)
             }
         }
         .padding()
@@ -275,69 +445,190 @@ struct WeatherCard: View {
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
         .padding(.horizontal)
+        .blur(radius: isLoading ? 3 : 0)
+        
+        // Loader overlay
+        if isLoading {
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle())
+                .scaleEffect(1.5)
+        }
+    }
+    
+    // Helper functions
+    
+    private func airQualityColor(for value: Double) -> Color {
+        switch value {
+        case 0..<25: return .green
+        case 25..<50: return .yellow
+        case 50..<75: return .orange
+        case 75..<100: return .red
+        default: return .purple
+        }
+    }
+    
+    private func pollenColor(for risk: String) -> Color {
+        switch risk.lowercased() {
+        case "low": return .green
+        case "moderate": return .yellow
+        case "high": return .orange
+        case "very high": return .red
+        default: return .gray
+        }
     }
 }
 
-// MARK: - Stats Grid View
-struct StatsGridView: View {
-    let stats: DashboardStats
+
+// MARK: - Air Quality Badge
+struct AirQualityBadge: View {
+    let aqi: Int
+    let status: String
     
     var body: some View {
-        LazyVGrid(columns: [
-            GridItem(.flexible()),
-            GridItem(.flexible())
-        ], spacing: 16) {
-            StatItem(
-                title: "Check-ins",
-                value: "\(stats.totalCheckIns)",
-                color: .blue
-            )
+        HStack(spacing: 6) {
+            Circle()
+                .fill(aqiColor)
+                .frame(width: 8, height: 8)
             
-            StatItem(
-                title: "Weekly",
-                value: "\(stats.weeklyAssessments)",
-                color: .green
-            )
-            
-            StatItem(
-                title: "Monthly",
-                value: "\(stats.monthlyAssessments)",
-                color: .purple
-            )
-            
-            StatItem(
-                title: "Medications",
-                value: "\(stats.medicationCount)",
-                color: .orange
-            )
+            Text("\(aqi) - \(status)")
+                .font(.caption)
+                .fontWeight(.medium)
+                .foregroundColor(aqiColor)
         }
-        .padding(.horizontal)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(aqiColor.opacity(0.1))
+        .cornerRadius(8)
+    }
+    
+    private var aqiColor: Color {
+        switch aqi {
+        case 0..<50: return .green
+        case 50..<100: return .yellow
+        case 100..<150: return .orange
+        case 150..<200: return .red
+        default: return .purple
+        }
     }
 }
 
-// MARK: - Stat Item
-struct StatItem: View {
-    let title: String
+// MARK: - Air Quality Item
+struct AirQualityItem: View {
+    let label: String
     let value: String
     let color: Color
     
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 4) {
             Text(value)
-                .font(.title2)
+                .font(.caption)
                 .fontWeight(.bold)
                 .foregroundColor(color)
             
-            Text(title)
-                .font(.caption)
+            Text(label)
+                .font(.caption2)
                 .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity)
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
     }
+}
+
+// MARK: - Pollen Item
+struct PollenItem: View {
+    let label: String
+    let value: String
+    let risk: String
+    let color: Color
+    
+    var body: some View {
+        VStack(spacing: 4) {
+            Text(value)
+                .font(.caption)
+                .fontWeight(.bold)
+                .foregroundColor(color)
+            
+            Text(label)
+                .font(.caption2)
+                .foregroundColor(.secondary)
+            
+            Text(risk)
+                .font(.caption2)
+                .fontWeight(.medium)
+                .foregroundColor(color)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+
+struct PointsCard: View {
+    @State private var animate = false
+    let points: Int
+    
+    var body: some View {
+        HStack {
+            // Left side: Heart + Points + Label
+            HStack(spacing: 10) {
+                Image(systemName: "heart.fill")
+                    .font(.system(size: 36))
+                    .foregroundColor(.yellow)
+                    .shadow(radius: 2)
+                
+                VStack(alignment: .leading, spacing: 7) {
+                    Text("\(points)")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .scaleEffect(animate ? 1.2 : 1.0)
+                        .animation(
+                            .easeInOut(duration: 0.6)
+                            .repeatForever(autoreverses: true),
+                            value: animate
+                        )
+                    
+                    Text("Points you earned")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+            }
+            
+            Spacer()
+            
+            // Right side
+            Text("Keep it up!")
+                .font(.headline)
+                .fontWeight(.semibold)
+                .foregroundColor(.green)
+        }
+        .padding()
+        .frame(maxWidth: .infinity).frame(maxWidth: .infinity, minHeight: 100)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+        )
+        .padding(.horizontal)
+        .onAppear {
+            animate = true
+        }
+    }
+}
+
+
+// MARK: - Helper Functions
+private func formattedCurrentTime() -> String {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "h:mm a"
+    return formatter.string(from: Date())
+}
+
+private func formattedDate(from timestamp: String) -> String {
+    let formatter = ISO8601DateFormatter()
+    if let date = formatter.date(from: timestamp) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "h:mm a"
+        return dateFormatter.string(from: date)
+    }
+    return "N/A"
 }
 
 // MARK: - Preview

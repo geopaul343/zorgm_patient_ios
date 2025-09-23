@@ -6,6 +6,7 @@ class NavigationManager: ObservableObject {
     // MARK: - Published Properties
     @Published var selectedTab: Tab = .dashboard
     @Published var navigationPath = NavigationPath()
+    @Published var selectedAssessmentType: AssessmentType? = nil
     
     // MARK: - Tab Enum
     enum Tab: String, CaseIterable {
@@ -29,11 +30,15 @@ class NavigationManager: ObservableObject {
     // MARK: - Navigation Methods
     func navigateToTab(_ tab: Tab) {
         selectedTab = tab
+        // Clear assessment type when switching tabs
+        if tab != .assessments {
+            selectedAssessmentType = nil
+        }
     }
     
     func navigateToAssessment(_ type: AssessmentType) {
         selectedTab = .assessments
-        // Additional navigation logic for specific assessments
+        selectedAssessmentType = type
     }
     
     func navigateToMedications() {

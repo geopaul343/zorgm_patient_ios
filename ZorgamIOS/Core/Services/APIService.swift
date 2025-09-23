@@ -134,7 +134,9 @@ class APIService: ObservableObject {
     
     // MARK: - Health Assessments
     func getHealthAssessment(type: AssessmentType) -> AnyPublisher<HealthAssessmentResponse, APIError> {
-        return performRequest(endpoint: "/assessments/\(type.rawValue.lowercased())", method: "GET", body: nil)
+
+        return performGetRequest<HealthAssessmentResponse>(endpoint: "/assessments/\(type.rawValue.lowercased())")
+
     }
     
     func submitAssessment(type: AssessmentType, answers: [String: String]) -> AnyPublisher<AssessmentResult, APIError> {
@@ -261,6 +263,7 @@ class APIService: ObservableObject {
             }
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
+
     }
     
     func addMedication(_ medication: AddMedicationRequest) -> AnyPublisher<Medication, APIError> {
@@ -605,27 +608,87 @@ class APIService: ObservableObject {
                 }
             }
             .eraseToAnyPublisher()
+
     }
     
     // MARK: - Health Summary
     func getHealthSummary() -> AnyPublisher<HealthSummary, APIError> {
-        return performRequest(endpoint: "/health/summary", method: "GET", body: nil)
+
+        print("🌐 Making API call to: \(baseURL)/dashboard/health-summary")
+        return performGetRequest<HealthSummary>(endpoint: "/dashboard/health-summary")
     }
     
     func getWeatherData() -> AnyPublisher<WeatherData, APIError> {
-        return performRequest(endpoint: "/weather", method: "GET", body: nil)
+        return performGetRequest<WeatherData>(endpoint: "/weather")
     }
     
-    // MARK: - History/Questionnaires
-    func getQuestionnaire(type: CheckinType) -> AnyPublisher<[QuestionnaireResponse], APIError> {
-        return performRequest(endpoint: "/questionnaires/comprehensive/checkin/\(type.rawValue.lowercased())", method: "GET", body: nil)
+    // MARK: - Questionnaires
+    func getQuestionnaire(type: AssessmentType) -> AnyPublisher<[Questionnaire], APIError> {
+        print("🌐 Making API call to: \(baseURL)/questionnaires/comprehensive/checkin/\(type.rawValue.lowercased())")
+        return performGetRequest<[Questionnaire]>(endpoint: "/questionnaires/comprehensive/checkin/\(type.rawValue.lowercased())")
     }
     
-    func submitQuestionnaire(_ request: SubmissionRequest) -> AnyPublisher<SubmissionResponse, APIError> {
-        return performRequest(endpoint: "/questionnaires/submissions", method: "POST", body: request)
+    func submitQuestionnaire(submission: QuestionnaireSubmission) -> AnyPublisher<SubmissionResponse, APIError> {
+        print("🌐 Making API call to: \(baseURL)/questionnaires/submissions")
+        print("📤 Submission data: \(submission)")
+        return performRequest<QuestionnaireSubmission, SubmissionResponse>(endpoint: "/questionnaires/submissions", method: "POST", body: submission)
     }
     
-    func getSubmissions(aggregate: Bool = false) -> AnyPublisher<[SubmissionResponse], APIError> {
+    // MARK: - Debug Method
+    func debugSubmitQuestionnaire(submission: QuestionnaireSubmission) -> AnyPublisher<String, APIError> {
+        print("🌐 Making DEBUG API call to: \(baseURL)/questionnaires/submissions")
+        print("📤 Submission data: \(submission)")
+        
+        guard let url = URL(string: baseURL + "/questionnaires/submissions") else {
+            return Fail(error: APIError.invalidURL)
+                .eraseToAnyPublisher()
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // Add auth token if available
+        if let token = SessionManager().authToken {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        
+        do {
+            request.httpBody = try JSONEncoder().encode(submission)
+        } catch {
+            return Fail(error: APIError.encodingError)
+                .eraseToAnyPublisher()
+        }
+        
+        return session.dataTaskPublisher(for: request)
+            .tryMap { data, response -> String in
+                print("📡 DEBUG API Response received")
+                if let httpResponse = response as? HTTPURLResponse {
+                    print("📊 HTTP Status Code: \(httpResponse.statusCode)")
+                }
+                print("📦 Response data size: \(data.count) bytes")
+                if let responseString = String(data: data, encoding: .utf8) {
+                    print("📄 Raw response content: \(responseString)")
+                    return responseString
+                }
+                return "No response content"
+            }
+            .mapError { error in
+                print("❌ DEBUG Request error: \(error)")
+                return APIError.networkError(error.localizedDescription)
+            }
+            .eraseToAnyPublisher()
+    }
+    
+    // MARK: - Generic Request Methods
+    private func performGetRequest<R: Codable>(endpoint: String) -> AnyPublisher<R, APIError> {
+        guard let url = URL(string: baseURL + endpoint) else {
+            print("❌ Invalid URL: \(baseURL + endpoint)")
+            return Fail(error: APIError.invalidURL)
+                .eraseToAnyPublisher()
+        }
+      
+     func getSubmissions(aggregate: Bool = false) -> AnyPublisher<[SubmissionResponse], APIError> {
         print("📋 Starting getSubmissions API call...")
         print("📡 Endpoint: /questionnaires/submissions")
         print("🔧 URL Parameters: aggregate=\(aggregate)")
@@ -877,22 +940,33 @@ class APIService: ObservableObject {
                 // Check HTTP status code
                 if let httpResponse = response as? HTTPURLResponse {
                     print("📡 HTTP Status Code: \(httpResponse.statusCode)")
+
                     switch httpResponse.statusCode {
                     case 200...299:
+                        print("✅ API call successful")
                         break // Success
                     case 401:
+                        print("❌ Unauthorized - Invalid credentials")
                         throw APIError.serverError("Invalid username or password")
                     case 400:
+                        print("❌ Bad Request - Invalid request format")
                         throw APIError.serverError("Invalid request format")
                     case 500:
+                        print("❌ Server Error")
                         throw APIError.serverError("Server error. Please try again later")
                     default:
+
                         throw APIError.serverError("Request failed: \(httpResponse.statusCode)")
                     }
+                }
+                print("📦 Response data size: \(data.count) bytes")
+                if let responseString = String(data: data, encoding: .utf8) {
+                    print("📄 Response content: \(responseString)")
                 }
                 return data
             }
             .decode(type: R.self, decoder: JSONDecoder())
+        
             .mapError { error in
                 if let apiError = error as? APIError {
                     return apiError

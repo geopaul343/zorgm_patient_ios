@@ -313,5 +313,6 @@ class HistoryViewModel: ObservableObject {
     var recordsByType: [CheckInType: Int] {
         Dictionary(grouping: checkInRecords, by: { $0.type })
             .mapValues { $0.count }
+
     }
 }

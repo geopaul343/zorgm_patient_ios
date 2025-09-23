@@ -11,53 +11,88 @@ struct AssessmentsView: View {
     // MARK: - Body
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Header
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Health Assessments")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                        
-                        Text("Complete your health check-ins to track your progress")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal)
-                    
-                    // Assessment Types
-                    LazyVStack(spacing: 16) {
-                        ForEach(AssessmentType.allCases, id: \.self) { type in
-                            AssessmentCard(
-                                type: type,
-                                isCompleted: viewModel.isAssessmentCompleted(type),
-                                lastCompleted: viewModel.getLastCompletedDate(type),
-                                onTap: {
-                                    navigationManager.navigateToAssessment(type)
-                                }
-                            )
+            Group {
+                if let selectedType = navigationManager.selectedAssessmentType {
+                    // Show specific assessment view (from dashboard navigation)
+                    assessmentView(for: selectedType)
+                } else {
+                    // Always show daily assessment view when Assessments tab is selected
+                    DailyAssessmentView()
+                }
+            }
+            .navigationTitle(navigationManager.selectedAssessmentType?.displayName ?? "Daily Check-in")
+            .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                if navigationManager.selectedAssessmentType != nil {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button("Back") {
+                            navigationManager.selectedAssessmentType = nil
                         }
                     }
-                    .padding(.horizontal)
-                    
-                    // Recent Activity
-                    if !viewModel.recentActivity.isEmpty {
-                        RecentActivityView(activities: viewModel.recentActivity)
-                    }
                 }
-                .padding(.bottom, 20)
-            }
-            .navigationTitle("Assessments")
-            .navigationBarTitleDisplayMode(.large)
-            .refreshable {
-                await viewModel.refreshData()
             }
         }
         .onAppear {
             Task {
                 await viewModel.loadData()
             }
+        }
+    }
+    
+    // MARK: - Assessment List View
+    private var assessmentListView: some View {
+        ScrollView {
+            VStack(spacing: 20) {
+                // Header
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Health Assessments")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                    
+                    Text("Complete your health check-ins to track your progress")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
+                
+                // Assessment Types
+                LazyVStack(spacing: 16) {
+                    ForEach(AssessmentType.allCases, id: \.self) { type in
+                        AssessmentCard(
+                            type: type,
+                            isCompleted: viewModel.isAssessmentCompleted(type),
+                            lastCompleted: viewModel.getLastCompletedDate(type),
+                            onTap: {
+                                navigationManager.navigateToAssessment(type)
+                            }
+                        )
+                    }
+                }
+                .padding(.horizontal)
+                
+                // Recent Activity
+                if !viewModel.recentActivity.isEmpty {
+                    RecentActivityView(activities: viewModel.recentActivity)
+                }
+            }
+            .padding(.bottom, 20)
+        }
+        .refreshable {
+            await viewModel.refreshData()
+        }
+    }
+    
+    // MARK: - Assessment View for Type
+    @ViewBuilder
+    private func assessmentView(for type: AssessmentType) -> some View {
+        switch type {
+        case .daily:
+            DailyAssessmentView()
+        case .weekly:
+            WeeklyAssessmentView()
+        case .monthly:
+            MonthlyAssessmentView()
         }
     }
 }

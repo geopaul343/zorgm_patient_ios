@@ -58,3 +58,4 @@ struct MainTabView: View {
         .environmentObject(NavigationManager())
         .environmentObject(SessionManager())
 }
+

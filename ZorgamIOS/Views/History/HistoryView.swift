@@ -6,6 +6,7 @@ struct HistoryView: View {
     // MARK: - State
     @StateObject private var viewModel = HistoryViewModel()
     @State private var showingSortOptions = false
+
     
     // MARK: - Body
     var body: some View {
@@ -42,12 +43,14 @@ struct HistoryView: View {
                     }
                 } else {
                     RecordsListView(records: viewModel.filteredRecords)
+
                 }
             }
             .navigationTitle("History")
             .navigationBarTitleDisplayMode(.large)
             .refreshable {
                 await viewModel.refreshData()
+
             }
         }
         .onAppear {
@@ -182,10 +185,11 @@ struct CheckInRecordCard: View {
                 .foregroundColor(.blue)
                 .frame(width: 30, height: 30)
                 .background(Color.blue.opacity(0.1))
-                .clipShape(Circle())
+     .clipShape(Circle())
             
             // Content
             VStack(alignment: .leading, spacing: 4) {
+
                 Text("Check-in: \(record.type.displayName)")
                     .font(.subheadline)
                     .fontWeight(.medium)
@@ -193,6 +197,7 @@ struct CheckInRecordCard: View {
                 Text("Submitted on: \(record.submittedAt, formatter: dateFormatter)")
                     .font(.caption)
                     .foregroundColor(.secondary)
+
             }
             
             Spacer()

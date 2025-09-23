@@ -37,6 +37,7 @@ class MedicationsViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
+    @MainActor
     func addMedication(_ request: AddMedicationRequest) {
         // API call
         apiService.addMedication(request)
@@ -59,6 +60,7 @@ class MedicationsViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
+    @MainActor
     func updateMedication(_ medication: Medication, with request: AddMedicationRequest) {
         // API call
         apiService.updateMedication(id: medication.id, medication: request)
@@ -79,6 +81,7 @@ class MedicationsViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
+    @MainActor
     func deleteMedication(_ medication: Medication) {
         // API call
         apiService.deleteMedication(id: medication.id)
