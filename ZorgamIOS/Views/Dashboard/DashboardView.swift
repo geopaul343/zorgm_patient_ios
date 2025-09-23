@@ -38,19 +38,6 @@ struct DashboardView: View {
                                         .foregroundColor(.blue)
                                 )
                         }
-                        
-                        // Test API Button (for debugging)
-                        Button("Test API") {
-                            Task {
-                                await viewModel.testAPI()
-                            }
-                        }
-                        .padding(.horizontal)
-                        .padding(.vertical, 8)
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                        
                     }
                     .padding(.horizontal)
                     .padding(.top)
