@@ -24,6 +24,44 @@ class SessionManager: ObservableObject {
         print("SessionManager initialized")
     }
     
+    // MARK: - Token Validation
+    func isTokenValid() -> Bool {
+        guard let token = authToken else { return false }
+        
+        // Decode JWT token to check expiry
+        let parts = token.components(separatedBy: ".")
+        guard parts.count == 3 else { return false }
+        
+        // Decode payload (second part)
+        let payload = parts[1]
+        let paddedPayload = payload.padding(toLength: ((payload.count + 3) / 4) * 4, withPad: "=", startingAt: 0)
+        
+        guard let data = Data(base64Encoded: paddedPayload),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let exp = json["exp"] as? TimeInterval else { return false }
+        
+        let currentTime = Date().timeIntervalSince1970
+        let isExpired = currentTime >= exp
+        
+        if isExpired {
+            print("⚠️ Token expired at: \(Date(timeIntervalSince1970: exp))")
+            print("🕐 Current time: \(Date())")
+        } else {
+            print("✅ Token is valid until: \(Date(timeIntervalSince1970: exp))")
+        }
+        
+        return !isExpired
+    }
+    
+    func clearSession() {
+        currentUser = nil
+        authToken = nil
+        isLoggedIn = false
+        userDefaults.removeObject(forKey: authTokenKey)
+        userDefaults.removeObject(forKey: userKey)
+        print("🔓 Session cleared")
+    }
+    
     func login(user: User, token: String) {
         self.currentUser = user
         self.authToken = token

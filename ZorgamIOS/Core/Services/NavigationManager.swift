@@ -21,7 +21,7 @@ class NavigationManager: ObservableObject {
             case .dashboard: return "house.fill"
             case .assessments: return "checkmark.circle.fill"
             case .medications: return "pills.fill"
-            case .history: return "clock.arrow.circlepath"
+            case .history: return "clock.fill"
             case .settings: return "gear"
             }
         }

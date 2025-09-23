@@ -1,230 +1,318 @@
 import Foundation
 import Combine
-import SwiftUI
-
-// MARK: - Filter Type Enum
-enum FilterType: String, CaseIterable {
-    case daily, weekly, monthly, onetime
-}
 
 // MARK: - History View Model
 class HistoryViewModel: ObservableObject {
     // MARK: - Published Properties
-    @Published var historyItems: [HistoryItem] = []
-    @Published var isLoading: Bool = false
+    @Published var checkInRecords: [CheckInRecord] = []
+    @Published var filteredRecords: [CheckInRecord] = []
+    @Published var selectedFilter: FilterType = .all
+    @Published var selectedSort: SortOption = .newestFirst
+    @Published var isLoading = false
     @Published var errorMessage: String?
     
     // MARK: - Private Properties
-    private let apiService = APIService()
     private var cancellables = Set<AnyCancellable>()
+    private let apiService = APIService()
+    private var isLoadingData = false
+    
+    // MARK: - Initialization
+    init() {
+        setupSubscriptions()
+        Task {
+            await loadData()
+        }
+    }
+    
+    deinit {
+        cancellables.removeAll()
+    }
     
     // MARK: - Public Methods
-    @MainActor
-    func loadHistory(for filter: FilterType = .daily) async {
-        isLoading = true
-        errorMessage = nil
+    func loadData() async {
+        // Prevent multiple simultaneous API calls
+        guard !isLoadingData else {
+            print("⚠️ API call already in progress, skipping...")
+            return
+        }
         
-        // For now, we'll use mock data since the API doesn't have a history endpoint yet
-        // In the future, you can replace this with actual API calls
-        await loadMockHistory(for: filter)
+        print("🚀 Starting API call to fetch questionnaire submissions...")
+        
+        await MainActor.run {
+            isLoading = true
+            errorMessage = nil
+            isLoadingData = true
+        }
+        
+        // Cancel any existing API subscriptions
+        cancellables.removeAll()
+        
+        // Call API to get questionnaire submissions
+        apiService.getSubmissions(aggregate: false)
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    guard let self = self else { return }
+                    self.isLoading = false
+                    self.isLoadingData = false
+                    
+                    switch completion {
+                    case .finished:
+                        print("✅ API call completed successfully")
+                    case .failure(let error):
+                        self.errorMessage = error.localizedDescription
+                        print("❌ API Error: \(error.localizedDescription)")
+                        print("📱 Falling back to mock data...")
+                        self.loadMockData()
+                    }
+                },
+                receiveValue: { [weak self] submissions in
+                    guard let self = self else { return }
+                    
+                    print("✅ API Response received:")
+                    print("📊 Total submissions: \(submissions.count)")
+                    print("🔍 Raw API Response:")
+                    print("=====================================")
+                    
+                    if submissions.isEmpty {
+                        print("📭 No submissions found in API response")
+                    } else {
+                        // Print each submission with detailed formatting
+                        for (index, submission) in submissions.enumerated() {
+                            print("📋 Submission \(index + 1):")
+                            print("   🆔 ID: \(submission.id)")
+                            print("   👤 User ID: \(submission.userId)")
+                            print("   📝 Questionnaire ID: \(submission.questionnaireId)")
+                            print("   📅 Checkin Type: \(submission.checkinType)")
+                            print("   ⏰ Submitted at: \(submission.submittedAt)")
+                            print("   ✅ Status: \(submission.status)")
+                            print("   💬 Nurse Comments: \(submission.nurseComments ?? "None")")
+                            print("   📄 Answers JSON: \(submission.answersJson)")
+                            print("   " + String(repeating: "-", count: 40))
+                        }
+                    }
+                    
+                    print("=====================================")
+                    print("🔄 Converting API response to CheckInRecord objects...")
+                    
+                    // Convert API response to CheckInRecord
+                    self.convertSubmissionsToCheckInRecords(submissions)
+                    self.applyFiltersAndSort()
+                    
+                    print("✅ Data processing completed")
+                    print("📊 Final filtered records count: \(self.filteredRecords.count)")
+                }
+            )
+            .store(in: &cancellables)
     }
     
-    @MainActor
-    func loadHistory() async {
-        await loadHistory(for: .daily)
+    func refreshData() async {
+        await loadData()
     }
     
-    private func loadMockHistory(for filter: FilterType = .daily) async {
-        // Simulate network delay
-        try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 second
-        
-        // Mock history data based on filter
-        let mockItems = getMockData(for: filter)
-        
-        historyItems = mockItems
+    func cancelAllRequests() {
+        cancellables.removeAll()
+        isLoadingData = false
         isLoading = false
     }
     
-    private func getMockData(for filter: FilterType) -> [HistoryItem] {
-        switch filter {
-        case .daily:
-            return [
-                HistoryItem(
-                    id: "daily_1",
-                    title: "Morning Check-in",
-                    description: "Daily health assessment completed",
-                    timestamp: Date().addingTimeInterval(-3600), // 1 hour ago
-                    icon: "sun.max.fill",
-                    color: .orange,
-                    status: "Completed"
-                ),
-                HistoryItem(
-                    id: "daily_2",
-                    title: "Medication Taken",
-                    description: "Metformin 500mg taken",
-                    timestamp: Date().addingTimeInterval(-7200), // 2 hours ago
-                    icon: "pills.fill",
-                    color: .blue,
-                    status: "Success"
-                ),
-                HistoryItem(
-                    id: "daily_3",
-                    title: "Exercise Logged",
-                    description: "30 minutes walking recorded",
-                    timestamp: Date().addingTimeInterval(-10800), // 3 hours ago
-                    icon: "figure.walk",
-                    color: .green,
-                    status: "Completed"
-                )
-            ]
-            
-        case .weekly:
-            return [
-                HistoryItem(
-                    id: "weekly_1",
-                    title: "Weekly Health Report",
-                    description: "Summary of the past 7 days",
-                    timestamp: Date().addingTimeInterval(-86400), // 1 day ago
-                    icon: "chart.bar.fill",
-                    color: .blue,
-                    status: "Generated"
-                ),
-                HistoryItem(
-                    id: "weekly_2",
-                    title: "Medication Review",
-                    description: "Weekly medication adherence check",
-                    timestamp: Date().addingTimeInterval(-172800), // 2 days ago
-                    icon: "pills.circle.fill",
-                    color: .purple,
-                    status: "Completed"
-                ),
-                HistoryItem(
-                    id: "weekly_3",
-                    title: "Progress Update",
-                    description: "Health goals progress review",
-                    timestamp: Date().addingTimeInterval(-259200), // 3 days ago
-                    icon: "target",
-                    color: .green,
-                    status: "On Track"
-                )
-            ]
-            
-        case .monthly:
-            return [
-                HistoryItem(
-                    id: "monthly_1",
-                    title: "Monthly Health Assessment",
-                    description: "Comprehensive monthly health review",
-                    timestamp: Date().addingTimeInterval(-604800), // 1 week ago
-                    icon: "calendar.badge.checkmark",
-                    color: .green,
-                    status: "Completed"
-                ),
-                HistoryItem(
-                    id: "monthly_2",
-                    title: "Doctor Consultation",
-                    description: "Monthly checkup with Dr. Smith",
-                    timestamp: Date().addingTimeInterval(-1209600), // 2 weeks ago
-                    icon: "stethoscope",
-                    color: .blue,
-                    status: "Scheduled"
-                ),
-                HistoryItem(
-                    id: "monthly_3",
-                    title: "Lab Results",
-                    description: "Blood test results received",
-                    timestamp: Date().addingTimeInterval(-1814400), // 3 weeks ago
-                    icon: "testtube.2",
-                    color: .red,
-                    status: "Available"
-                )
-            ]
-            
-        case .onetime:
-            return [
-                HistoryItem(
-                    id: "onetime_1",
-                    title: "Initial Health Setup",
-                    description: "First-time health profile creation",
-                    timestamp: Date().addingTimeInterval(-2592000), // 1 month ago
-                    icon: "person.badge.plus",
-                    color: .purple,
-                    status: "Completed"
-                ),
-                HistoryItem(
-                    id: "onetime_2",
-                    title: "Emergency Contact Added",
-                    description: "Emergency contact information updated",
-                    timestamp: Date().addingTimeInterval(-3456000), // 1.5 months ago
-                    icon: "phone.circle.fill",
-                    color: .orange,
-                    status: "Updated"
-                ),
-                HistoryItem(
-                    id: "onetime_3",
-                    title: "Privacy Settings",
-                    description: "Data privacy preferences configured",
-                    timestamp: Date().addingTimeInterval(-4320000), // 2 months ago
-                    icon: "lock.shield.fill",
-                    color: .gray,
-                    status: "Configured"
-                )
-            ]
-        }
+    func selectFilter(_ filter: FilterType) {
+        selectedFilter = filter
+        applyFiltersAndSort()
     }
     
-    func refreshHistory() {
-        Task {
-            await loadHistory()
-        }
-    }
-}
-
-// MARK: - History Item Model
-struct HistoryItem: Identifiable, Codable {
-    let id: String
-    let title: String
-    let description: String
-    let timestamp: Date
-    let icon: String
-    let color: Color
-    let status: String?
-    
-    enum CodingKeys: String, CodingKey {
-        case id, title, description, timestamp, icon, status
+    func selectSort(_ sort: SortOption) {
+        selectedSort = sort
+        applyFiltersAndSort()
     }
     
-    init(id: String, title: String, description: String, timestamp: Date, icon: String, color: Color, status: String?) {
-        self.id = id
-        self.title = title
-        self.description = description
-        self.timestamp = timestamp
-        self.icon = icon
-        self.color = color
-        self.status = status
+    // MARK: - Private Methods
+    private func setupSubscriptions() {
+        $checkInRecords
+            .combineLatest($selectedFilter, $selectedSort)
+            .sink { [weak self] _, _, _ in
+                self?.applyFiltersAndSort()
+            }
+            .store(in: &cancellables)
     }
     
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(String.self, forKey: .id)
-        title = try container.decode(String.self, forKey: .title)
-        description = try container.decode(String.self, forKey: .description)
-        timestamp = try container.decode(Date.self, forKey: .timestamp)
-        icon = try container.decode(String.self, forKey: .icon)
-        status = try container.decodeIfPresent(String.self, forKey: .status)
+    private func applyFiltersAndSort() {
+        var filtered = checkInRecords
         
-        // For now, we'll use a default color since Color doesn't conform to Codable
-        // In a real app, you'd store the color as a string or use a different approach
-        self.color = .blue
+        // Apply filter
+        if selectedFilter != .all {
+            filtered = filtered.filter { record in
+                switch selectedFilter {
+                case .all:
+                    return true
+                case .daily:
+                    return record.type == .daily
+                case .weekly:
+                    return record.type == .weekly
+                case .monthly:
+                    return record.type == .monthly
+                case .oneTime:
+                    return record.type == .oneTime
+                }
+            }
+        }
+        
+        // Apply sort
+        filtered.sort { record1, record2 in
+            switch selectedSort {
+            case .newestFirst:
+                return record1.submittedAt > record2.submittedAt
+            case .oldestFirst:
+                return record1.submittedAt < record2.submittedAt
+            case .typeAscending:
+                return record1.type.displayName < record2.type.displayName
+            case .typeDescending:
+                return record1.type.displayName > record2.type.displayName
+            }
+        }
+        
+        filteredRecords = filtered
     }
     
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(id, forKey: .id)
-        try container.encode(title, forKey: .title)
-        try container.encode(description, forKey: .description)
-        try container.encode(timestamp, forKey: .timestamp)
-        try container.encode(icon, forKey: .icon)
-        try container.encodeIfPresent(status, forKey: .status)
+    private func convertSubmissionsToCheckInRecords(_ submissions: [SubmissionResponse]) {
+        var records: [CheckInRecord] = []
+        
+        for submission in submissions {
+            // Parse the submitted date
+            let dateFormatter = ISO8601DateFormatter()
+            let submittedDate = dateFormatter.date(from: submission.submittedAt) ?? Date()
+            
+            // Determine check-in type based on checkinType field
+            let checkInType = determineCheckInTypeFromString(submission.checkinType)
+            
+            // Determine status
+            let status = determineCheckInStatus(from: submission.status)
+            
+            // Create CheckInRecord
+            let record = CheckInRecord(
+                type: checkInType,
+                submittedAt: submittedDate,
+                status: status,
+                responses: submission.answersJson
+            )
+            
+            records.append(record)
+        }
+        
+        checkInRecords = records
+        print("✅ Converted \(records.count) API submissions to CheckInRecords")
+    }
+    
+    private func determineCheckInTypeFromString(_ checkinType: String) -> CheckInType {
+        switch checkinType.uppercased() {
+        case "DAILY":
+            return .daily
+        case "WEEKLY":
+            return .weekly
+        case "MONTHLY":
+            return .monthly
+        case "ONE_TIME":
+            return .oneTime
+        default:
+            return .oneTime
+        }
+    }
+    
+    private func determineCheckInType(from questionnaireName: String) -> CheckInType {
+        let name = questionnaireName.lowercased()
+        
+        if name.contains("daily") {
+            return .daily
+        } else if name.contains("weekly") {
+            return .weekly
+        } else if name.contains("monthly") {
+            return .monthly
+        } else {
+            return .oneTime
+        }
+    }
+    
+    private func determineCheckInStatus(from status: String) -> CheckInStatus {
+        switch status.lowercased() {
+        case "completed", "submitted":
+            return .completed
+        case "pending":
+            return .pending
+        case "in_progress", "in progress":
+            return .inProgress
+        case "failed", "error":
+            return .failed
+        default:
+            return .completed
+        }
+    }
+    
+    
+    private func loadMockData() {
+        print("📱 Loading mock data as fallback...")
+        let calendar = Calendar.current
+        let now = Date()
+        
+        // Generate mock data for the past 30 days
+        var mockRecords: [CheckInRecord] = []
+        
+        for i in 0..<30 {
+            let date = calendar.date(byAdding: .day, value: -i, to: now) ?? now
+            
+            // Add daily check-ins (every day)
+            if i % 1 == 0 {
+                mockRecords.append(CheckInRecord(
+                    type: .daily,
+                    submittedAt: calendar.date(byAdding: .hour, value: Int.random(in: 6...18), to: date) ?? date,
+                    status: .completed
+                ))
+            }
+            
+            // Add weekly check-ins (every 7 days)
+            if i % 7 == 0 {
+                mockRecords.append(CheckInRecord(
+                    type: .weekly,
+                    submittedAt: calendar.date(byAdding: .hour, value: Int.random(in: 9...17), to: date) ?? date,
+                    status: .completed
+                ))
+            }
+            
+            // Add monthly check-ins (every 15 days)
+            if i % 15 == 0 {
+                mockRecords.append(CheckInRecord(
+                    type: .monthly,
+                    submittedAt: calendar.date(byAdding: .hour, value: Int.random(in: 10...16), to: date) ?? date,
+                    status: .completed
+                ))
+            }
+            
+            // Add one-time check-ins (randomly)
+            if i % 10 == 0 {
+                mockRecords.append(CheckInRecord(
+                    type: .oneTime,
+                    submittedAt: calendar.date(byAdding: .hour, value: Int.random(in: 8...20), to: date) ?? date,
+                    status: .completed
+                ))
+            }
+        }
+        
+        checkInRecords = mockRecords
+        applyFiltersAndSort()
+        print("✅ Mock data loaded: \(mockRecords.count) records")
+    }
+    
+    // MARK: - Computed Properties
+    var totalRecords: Int {
+        checkInRecords.count
+    }
+    
+    var filteredRecordsCount: Int {
+        filteredRecords.count
+    }
+    
+    var recordsByType: [CheckInType: Int] {
+        Dictionary(grouping: checkInRecords, by: { $0.type })
+            .mapValues { $0.count }
+
     }
 }

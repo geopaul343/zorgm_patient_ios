@@ -14,6 +14,7 @@
 		A1234567890123456789013A /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013B /* SessionManager.swift */; };
 		A1234567890123456789013C /* NavigationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013D /* NavigationManager.swift */; };
 		A1234567890123456789013E /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013F /* APIService.swift */; };
+		A1234567890123456789016A /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789016B /* NotificationService.swift */; };
 		A1234567890123456789013G /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013H /* User.swift */; };
 		A1234567890123456789013I /* HealthAssessment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013J /* HealthAssessment.swift */; };
 		A1234567890123456789013K /* HealthSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013L /* HealthSummary.swift */; };
@@ -30,13 +31,14 @@
 		A1234567890123456789014G /* MedicationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789014H /* MedicationsView.swift */; };
 		A1234567890123456789014I /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789014J /* SettingsView.swift */; };
 		A1234567890123456789014K /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789014L /* WelcomeView.swift */; };
-		A1234567890123456789014Z /* HistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015A /* HistoryViewModel.swift */; };
+		A1234567890123456789015A /* CheckInRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015B /* CheckInRecord.swift */; };
+		A1234567890123456789015C /* HistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015D /* HistoryViewModel.swift */; };
+		A1234567890123456789015E /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015F /* HistoryView.swift */; };
 		A1234567890123456789015B /* DailyAssessmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015C /* DailyAssessmentView.swift */; };
 		A1234567890123456789015D /* WeeklyAssessmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015E /* WeeklyAssessmentView.swift */; };
 		A1234567890123456789015F /* MonthlyAssessmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015G /* MonthlyAssessmentView.swift */; };
 		A1234567890123456789015H /* Questionnaire.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015I /* Questionnaire.swift */; };
 		A1234567890123456789015J /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015K /* WeatherService.swift */; };
-		ECEE04812E795BB900429D35 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECEE047F2E795BB900429D35 /* HistoryView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +50,7 @@
 		A1234567890123456789013B /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		A1234567890123456789013D /* NavigationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationManager.swift; sourceTree = "<group>"; };
 		A1234567890123456789013F /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
+		A1234567890123456789016B /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		A1234567890123456789013H /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		A1234567890123456789013J /* HealthAssessment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthAssessment.swift; sourceTree = "<group>"; };
 		A1234567890123456789013L /* HealthSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthSummary.swift; sourceTree = "<group>"; };
@@ -64,13 +67,15 @@
 		A1234567890123456789014H /* MedicationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicationsView.swift; sourceTree = "<group>"; };
 		A1234567890123456789014J /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A1234567890123456789014L /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
-		A1234567890123456789015A /* HistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewModel.swift; sourceTree = "<group>"; };
+		A1234567890123456789015B /* CheckInRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckInRecord.swift; sourceTree = "<group>"; };
+		A1234567890123456789015D /* HistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewModel.swift; sourceTree = "<group>"; };
+		A1234567890123456789015F /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		FAA3B0C32E7A7ABF0045672E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		A1234567890123456789015C /* DailyAssessmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAssessmentView.swift; sourceTree = "<group>"; };
 		A1234567890123456789015E /* WeeklyAssessmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyAssessmentView.swift; sourceTree = "<group>"; };
 		A1234567890123456789015G /* MonthlyAssessmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyAssessmentView.swift; sourceTree = "<group>"; };
 		A1234567890123456789015I /* Questionnaire.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Questionnaire.swift; sourceTree = "<group>"; };
 		A1234567890123456789015K /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
-		ECEE047F2E795BB900429D35 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +92,7 @@
 		A1234567890123456789012K /* ZorgamIOS */ = {
 			isa = PBXGroup;
 			children = (
+				FAA3B0C32E7A7ABF0045672E /* Info.plist */,
 				A1234567890123456789012B /* ZorgamIOSApp.swift */,
 				A1234567890123456789012D /* ContentView.swift */,
 				A1234567890123456789014M /* Core */,
@@ -140,6 +146,7 @@
 				A1234567890123456789015A /* HistoryViewModel.swift */,
 				A1234567890123456789013V /* MedicationsViewModel.swift */,
 				A1234567890123456789013X /* WelcomeViewModel.swift */,
+				A1234567890123456789015D /* HistoryViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -150,6 +157,7 @@
 				ECEE04802E795BB900429D35 /* History */,
 				A1234567890123456789014R /* Assessments */,
 				A1234567890123456789014S /* Dashboard */,
+				A1234567890123456789015G /* History */,
 				A1234567890123456789014T /* Main */,
 				A1234567890123456789014U /* Medications */,
 				A1234567890123456789014V /* Settings */,
@@ -165,6 +173,7 @@
 				A1234567890123456789013J /* HealthAssessment.swift */,
 				A1234567890123456789013L /* HealthSummary.swift */,
 				A1234567890123456789013N /* Medication.swift */,
+				A1234567890123456789015B /* CheckInRecord.swift */,
 				A1234567890123456789015I /* Questionnaire.swift */,
 			);
 			path = Models;
@@ -176,6 +185,7 @@
 				A1234567890123456789013B /* SessionManager.swift */,
 				A1234567890123456789013D /* NavigationManager.swift */,
 				A1234567890123456789013F /* APIService.swift */,
+				A1234567890123456789016B /* NotificationService.swift */,
 				A1234567890123456789015K /* WeatherService.swift */,
 			);
 			path = Services;
@@ -233,10 +243,11 @@
 			path = Welcome;
 			sourceTree = "<group>";
 		};
-		ECEE04802E795BB900429D35 /* History */ = {
+		A1234567890123456789015G /* History */ = {
 			isa = PBXGroup;
 			children = (
-				ECEE047F2E795BB900429D35 /* HistoryView.swift */,
+				A1234567890123456789015F /* HistoryView.swift */,
+
 			);
 			path = History;
 			sourceTree = "<group>";
@@ -316,17 +327,19 @@
 				A1234567890123456789013A /* SessionManager.swift in Sources */,
 				A1234567890123456789013C /* NavigationManager.swift in Sources */,
 				A1234567890123456789013E /* APIService.swift in Sources */,
+				A1234567890123456789016A /* NotificationService.swift in Sources */,
 				ECEE04812E795BB900429D35 /* HistoryView.swift in Sources */,
 				A1234567890123456789013G /* User.swift in Sources */,
 				A1234567890123456789013I /* HealthAssessment.swift in Sources */,
 				A1234567890123456789013K /* HealthSummary.swift in Sources */,
 				A1234567890123456789013M /* Medication.swift in Sources */,
+				A1234567890123456789015A /* CheckInRecord.swift in Sources */,
 				A1234567890123456789013O /* AssessmentsViewModel.swift in Sources */,
 				A1234567890123456789013Q /* AssessmentDetailViewModel.swift in Sources */,
 				A1234567890123456789013S /* DashboardViewModel.swift in Sources */,
 				A1234567890123456789013U /* MedicationsViewModel.swift in Sources */,
 				A1234567890123456789013W /* WelcomeViewModel.swift in Sources */,
-				A1234567890123456789014Z /* HistoryViewModel.swift in Sources */,
+				A1234567890123456789015C /* HistoryViewModel.swift in Sources */,
 				A1234567890123456789013Y /* AssessmentDetailView.swift in Sources */,
 				A1234567890123456789014A /* AssessmentsView.swift in Sources */,
 				A1234567890123456789015B /* DailyAssessmentView.swift in Sources */,
@@ -339,6 +352,7 @@
 				A1234567890123456789014G /* MedicationsView.swift in Sources */,
 				A1234567890123456789014I /* SettingsView.swift in Sources */,
 				A1234567890123456789014K /* WelcomeView.swift in Sources */,
+				A1234567890123456789015E /* HistoryView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -475,8 +489,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ZorgamIOS/Preview Content\"";
+				DEVELOPMENT_TEAM = XQSD7HHY9T;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ZorgamIOS/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -506,8 +522,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ZorgamIOS/Preview Content\"";
+				DEVELOPMENT_TEAM = XQSD7HHY9T;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ZorgamIOS/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
