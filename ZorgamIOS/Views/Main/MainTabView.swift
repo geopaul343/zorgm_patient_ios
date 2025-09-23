@@ -32,6 +32,14 @@ struct MainTabView: View {
                 }
                 .tag(NavigationManager.Tab.medications)
             
+            // History Tab
+            HistoryView()
+                .tabItem {
+                    Image(systemName: NavigationManager.Tab.history.icon)
+                    Text(NavigationManager.Tab.history.rawValue)
+                }
+                .tag(NavigationManager.Tab.history)
+            
             // Settings Tab
             SettingsView()
                 .tabItem {
