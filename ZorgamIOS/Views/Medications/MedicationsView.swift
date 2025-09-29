@@ -57,12 +57,15 @@ struct MedicationsView: View {
                                     },
                                     onEdit: { medication in
                                         print("✏️ Edit button tapped for medication: \(medication.name)")
-                                        // Set medication first, then show sheet
+                                        // Set both values together to avoid timing issues
                                         medicationToEdit = medication
-                                        // Use DispatchQueue to ensure state is updated before showing sheet
-                                        DispatchQueue.main.async {
-                                            showingEditMedication = true
-                                            print("📱 showingEditMedication set to: \(showingEditMedication)")
+                                        showingEditMedication = true
+                                        print("📱 showingEditMedication set to: \(showingEditMedication)")
+                                        print("📱 medicationToEdit set to: \(medicationToEdit?.name ?? "nil")")
+                                        
+                                        // Verify the state is set correctly
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                            print("🔍 After 0.1s - medicationToEdit: \(medicationToEdit?.name ?? "nil")")
                                         }
                                     },
                                     onDelete: { medication in
@@ -105,51 +108,6 @@ struct MedicationsView: View {
             )
             .navigationTitle("Medications")
             .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
-                        Button("Test Alarm (5s)") {
-                            if let firstMedication = viewModel.medications.first {
-                                viewModel.testNotification(for: firstMedication)
-                            }
-                        }
-                        Button("Force Immediate (1s)") {
-                            if let firstMedication = viewModel.medications.first {
-                                viewModel.forceImmediateNotification(for: firstMedication)
-                            }
-                        }
-                        Button("Test Sound Now") {
-                            viewModel.testSoundDirectly()
-                        }
-                        Button("Test Alarm Sound") {
-                            viewModel.testAlarmSound()
-                        }
-                        Button("Create Alarm Notification") {
-                            if let firstMedication = viewModel.medications.first {
-                                viewModel.createAlarmNotification(for: firstMedication)
-                            }
-                        }
-                        Button("Test Background Alarm") {
-                            if let firstMedication = viewModel.medications.first {
-                                viewModel.testBackgroundNotification(for: firstMedication)
-                            }
-                        }
-                        Button("Create Alarm Sound") {
-                            viewModel.createAlarmSoundFile()
-                        }
-                        Button("Enable Background Refresh") {
-                            viewModel.requestBackgroundAppRefresh()
-                        }
-                        Button("Check Settings") {
-                            Task {
-                                await viewModel.checkNotificationSettings()
-                            }
-                        }
-                    } label: {
-                        Image(systemName: "bell.badge")
-                    }
-                }
-            }
             .sheet(isPresented: $showingAddMedication) {
                 AddMedicationView { medication in
                     viewModel.addMedication(medication)
@@ -160,18 +118,43 @@ struct MedicationsView: View {
                 }
             }
             .sheet(isPresented: $showingEditMedication) {
-                if let medication = medicationToEdit {
-                    AddMedicationView(onSave: { request in
-                        viewModel.updateMedication(medication, with: request)
-                        // Update notification with new time
-                        viewModel.updateMedicationReminder(for: medication)
-                    }, medication: medication)
-                } else {
-                    // Fallback view if medication is nil
-                    Text("Loading medication data...")
+                Group {
+                    if let medication = medicationToEdit {
+                        AddMedicationView(onSave: { request in
+                            viewModel.updateMedication(medication, with: request)
+                            // Update notification with new time
+                            viewModel.updateMedicationReminder(for: medication)
+                        }, medication: medication)
+                        .onAppear {
+                            print("✅ Edit sheet opened with medication: \(medication.name)")
+                        }
+                    } else {
+                        // Fallback view if medication is nil
+                        VStack {
+                            Text("Loading medication data...")
+                                .font(.headline)
+                                .padding()
+                            
+                            Button("Retry") {
+                                // Try to reload the medication data
+                                Task {
+                                    await viewModel.loadMedications()
+                                }
+                            }
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                        }
                         .onAppear {
                             print("⚠️ Edit sheet opened but medicationToEdit is nil")
+                            print("⚠️ Current medicationToEdit value: \(medicationToEdit?.name ?? "nil")")
+                            print("⚠️ Available medications: \(viewModel.medications.map { $0.name })")
                         }
+                    }
+                }
+                .onAppear {
+                    print("🔍 Sheet onAppear - medicationToEdit: \(medicationToEdit?.name ?? "nil")")
                 }
             }
             .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
@@ -183,11 +166,19 @@ struct MedicationsView: View {
             }
         }
         .onAppear {
+            print("💊 MedicationsView appeared - loading medications...")
             // Initialize notifications
             viewModel.initializeNotifications()
             
             Task {
                 await viewModel.loadMedications()
+                print("💊 MedicationsView - loadMedications completed")
+            }
+        }
+        .onChange(of: showingEditMedication) { newValue in
+            print("🔄 showingEditMedication changed to: \(newValue)")
+            if newValue {
+                print("🔄 Sheet is showing, medicationToEdit: \(medicationToEdit?.name ?? "nil")")
             }
         }
     }

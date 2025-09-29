@@ -17,24 +17,32 @@ class MedicationsViewModel: ObservableObject {
     // MARK: - Public Methods
     @MainActor
     func loadMedications() async {
+        print("💊 Loading medications...")
         isLoading = true
         errorMessage = nil
         
-        apiService.getMedications()
-            .receive(on: DispatchQueue.main)
-            .sink(
-                receiveCompletion: { [weak self] result in
-                    self?.isLoading = false
-                    if case .failure(let error) = result {
-                        self?.errorMessage = error.localizedDescription
+        return await withCheckedContinuation { continuation in
+            apiService.getMedications()
+                .receive(on: DispatchQueue.main)
+                .sink(
+                    receiveCompletion: { [weak self] result in
+                        self?.isLoading = false
+                        if case .failure(let error) = result {
+                            print("❌ Failed to load medications: \(error.localizedDescription)")
+                            self?.errorMessage = error.localizedDescription
+                        } else {
+                            print("✅ Medications API call completed successfully")
+                        }
+                        continuation.resume()
+                    },
+                    receiveValue: { [weak self] medications in
+                        print("💊 Received \(medications.count) medications from API")
+                        self?.medications = medications
+                        print("✅ Successfully loaded \(medications.count) medications from API")
                     }
-                },
-                receiveValue: { [weak self] medications in
-                    self?.medications = medications
-                    print("✅ Successfully loaded \(medications.count) medications from API")
-                }
-            )
-            .store(in: &cancellables)
+                )
+                .store(in: &cancellables)
+        }
     }
     
     @MainActor

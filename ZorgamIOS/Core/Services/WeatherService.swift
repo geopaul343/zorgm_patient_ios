@@ -2,6 +2,18 @@ import Foundation
 import CoreLocation
 import Combine
 
+// MARK: - Weather Cache
+struct WeatherCache {
+    let data: WeatherData
+    let timestamp: Date
+    let location: CLLocation
+    
+    var isExpired: Bool {
+        let oneHour: TimeInterval = 3600 // 1 hour in seconds
+        return Date().timeIntervalSince(timestamp) > oneHour
+    }
+}
+
 // MARK: - Weather Service
 class WeatherService: NSObject, ObservableObject {
     private let apiKey = "AIzaSyCPpaDH4PV-qo6nQ3vLMllan04YOxmBjfE"
@@ -12,6 +24,7 @@ class WeatherService: NSObject, ObservableObject {
     @Published var locationPermissionStatus: CLAuthorizationStatus = .notDetermined
     
     private var cancellables = Set<AnyCancellable>()
+    private var weatherCache: WeatherCache?
     
     override init() {
         super.init()
@@ -57,14 +70,48 @@ class WeatherService: NSObject, ObservableObject {
                 .eraseToAnyPublisher()
         }
         
+        // Check if we have valid cached data for this location
+        if let cache = weatherCache,
+           !cache.isExpired,
+           isLocationSimilar(cache.location, location) {
+            print("🌤️ Using cached weather data (age: \(Int(Date().timeIntervalSince(cache.timestamp))) seconds)")
+            return Just(cache.data)
+                .setFailureType(to: Error.self)
+                .eraseToAnyPublisher()
+        }
+        
+        print("🌤️ Cache miss or expired, fetching fresh weather data...")
         let lat = location.coordinate.latitude
         let lon = location.coordinate.longitude
         
         return getAirQualityData(latitude: lat, longitude: lon)
             .map { airQualityData in
-                self.createWeatherData(from: airQualityData, location: location)
+                let weatherData = self.createWeatherData(from: airQualityData, location: location)
+                // Cache the new data
+                self.weatherCache = WeatherCache(data: weatherData, timestamp: Date(), location: location)
+                print("🌤️ Weather data cached successfully")
+                return weatherData
             }
             .eraseToAnyPublisher()
+    }
+    
+    // MARK: - Cache Management
+    private func isLocationSimilar(_ location1: CLLocation, _ location2: CLLocation) -> Bool {
+        // Consider locations similar if they're within 1km of each other
+        let distance = location1.distance(from: location2)
+        return distance < 1000 // 1km threshold
+    }
+    
+    func clearCache() {
+        weatherCache = nil
+        print("🗑️ Weather cache cleared")
+    }
+    
+    func getCachedWeather() -> WeatherData? {
+        guard let cache = weatherCache, !cache.isExpired else {
+            return nil
+        }
+        return cache.data
     }
     
     private func getAirQualityData(latitude: Double, longitude: Double) -> AnyPublisher<AirQualityAPIResponse, Error> {

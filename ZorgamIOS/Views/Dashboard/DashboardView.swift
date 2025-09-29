@@ -43,8 +43,8 @@ struct DashboardView: View {
                     .padding(.top)
                     
                     // Health Summary Card
-                    if let summary = viewModel.healthSummary {
-                        HealthSummaryCard(summary: summary, isLoading: viewModel.isLoading)
+                    if let stats = viewModel.stats {
+                        HealthSummaryCard(stats: stats, isLoading: viewModel.isLoading)
                     } else if viewModel.isLoading {
                         // Show loading state
                         VStack(spacing: 24) {
@@ -85,7 +85,7 @@ struct DashboardView: View {
                     
                     // Weather & Air Quality Card
                     if let weather = viewModel.weather {
-                        WeatherAirQualityCard(weather: weather, isLoading: viewModel.isLoading)
+                        WeatherAirQualityCard(weather: weather)
                     } else {
                         // Show loading state for air quality and pollen
                         VStack(spacing: 20) {
@@ -152,7 +152,7 @@ struct DashboardView: View {
                     )
                     
                     // Points Card - Last element in dashboard
-                    PointsCard(points: 1250)
+                    PointsCard(points: viewModel.totalPoints)
                     
                 }
                 .padding(.bottom, 20)
@@ -163,6 +163,26 @@ struct DashboardView: View {
                 await viewModel.refreshData()
             }
         }
+        .overlay(
+            // Confetti and Points Popup overlay
+            ZStack {
+                // Confetti overlay
+                if viewModel.showConfetti {
+                    ConfettiView()
+                        .allowsHitTesting(false)
+                }
+                
+                // Points popup overlay
+                if viewModel.showPointsPopup {
+                    VStack {
+                        Spacer()
+                        PointsPopupView(points: viewModel.pointsEarned)
+                            .padding(.bottom, 100)
+                    }
+                    .allowsHitTesting(false)
+                }
+            }
+        )
         .onAppear {
             Task {
                 await viewModel.loadData()
@@ -179,7 +199,7 @@ struct DashboardView: View {
 
 // MARK: - Health Summary Card
 struct HealthSummaryCard: View {
-    let summary: HealthSummary
+    let stats: DashboardStats
     let isLoading: Bool
     
     var body: some View {
@@ -194,11 +214,11 @@ struct HealthSummaryCard: View {
             
              // Row with 3 items (spaceBetween style)
              HStack {
-                 SummaryItem(icon: "heart.fill", number: summary.weeklyProgress.daily, label: "Daily", color: .red)
+                 SummaryItem(icon: "heart.fill", number: stats.dailyCheckIns, label: "Daily", color: .red)
                  Spacer()
-                 SummaryItem(icon: "chart.bar.fill", number: summary.weeklyProgress.weekly, label: "Weekly", color: .blue)
+                 SummaryItem(icon: "chart.bar.fill", number: stats.weeklyAssessments, label: "Weekly", color: .blue)
                  Spacer()
-                 SummaryItem(icon: "calendar", number: summary.weeklyProgress.monthly, label: "Monthly", color: .green)
+                 SummaryItem(icon: "calendar", number: stats.monthlyAssessments, label: "Monthly", color: .green)
              }
              .padding(.horizontal)
              
@@ -206,7 +226,7 @@ struct HealthSummaryCard: View {
              HStack(spacing: 8) {
                  Text("Total Submission")
                      .font(.headline)
-                 Text("\(summary.totalCheckIns)")
+                 Text("\(stats.totalCheckIns)")
                      .font(.headline)
                      .fontWeight(.bold)
              }
@@ -346,7 +366,6 @@ struct ActionButton: View {
 // MARK: - Weather & Air Quality Card
 struct WeatherAirQualityCard: View {
     let weather: WeatherData
-    let isLoading: Bool
     
     var body: some View {
         VStack(spacing: 20) {
@@ -358,20 +377,14 @@ struct WeatherAirQualityCard: View {
                 
                 Spacer()
                 
-                if isLoading {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle())
-                        .scaleEffect(0.8)
-                } else {
-                    VStack(alignment: .trailing, spacing: 2) {
-                        Text("Updated: \(formattedDate(from: weather.timestamp))")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                        
-                        Text(weather.location)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("Updated: \(formattedDate(from: weather.timestamp))")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    Text(weather.location)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
             }
             .padding(.horizontal)
@@ -445,14 +458,6 @@ struct WeatherAirQualityCard: View {
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
         .padding(.horizontal)
-        .blur(radius: isLoading ? 3 : 0)
-        
-        // Loader overlay
-        if isLoading {
-            ProgressView()
-                .progressViewStyle(CircularProgressViewStyle())
-                .scaleEffect(1.5)
-        }
     }
     
     // Helper functions
@@ -629,6 +634,100 @@ private func formattedDate(from timestamp: String) -> String {
         return dateFormatter.string(from: date)
     }
     return "N/A"
+}
+
+// MARK: - Confetti View
+struct ConfettiView: View {
+    @State private var animate = false
+    
+    var body: some View {
+        ZStack {
+            ForEach(0..<50, id: \.self) { index in
+                Circle()
+                    .fill(colors.randomElement() ?? .red)
+                    .frame(width: 8, height: 8)
+                    .offset(
+                        x: animate ? CGFloat.random(in: -200...200) : 0,
+                        y: animate ? CGFloat.random(in: -400...400) : -50
+                    )
+                    .opacity(animate ? 0 : 1)
+                    .animation(
+                        Animation.easeOut(duration: Double.random(in: 2...4))
+                            .delay(Double.random(in: 0...1))
+                    )
+            }
+        }
+        .onAppear {
+            animate = true
+        }
+    }
+    
+    private let colors: [Color] = [.red, .blue, .green, .yellow, .orange, .purple, .pink]
+}
+
+// MARK: - Points Popup View
+struct PointsPopupView: View {
+    let points: Int
+    @State private var animate = false
+    @State private var scale: CGFloat = 0.5
+    @State private var opacity: Double = 0
+    
+    var body: some View {
+        VStack(spacing: 12) {
+            // Points icon
+            Image(systemName: "star.fill")
+                .font(.system(size: 40))
+                .foregroundColor(.yellow)
+                .scaleEffect(animate ? 1.2 : 0.8)
+                .animation(
+                    Animation.easeInOut(duration: 0.6)
+                        .repeatForever(autoreverses: true),
+                    value: animate
+                )
+            
+            // Points text
+            VStack(spacing: 4) {
+                Text("+\(points)")
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                    .scaleEffect(animate ? 1.1 : 0.9)
+                    .animation(
+                        Animation.easeInOut(duration: 0.8)
+                            .repeatForever(autoreverses: true),
+                        value: animate
+                    )
+                
+                Text("Points Earned!")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.white.opacity(0.9))
+            }
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 20)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: [.blue, .purple]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
+        )
+        .scaleEffect(scale)
+        .opacity(opacity)
+        .onAppear {
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                scale = 1.0
+                opacity = 1.0
+            }
+            
+            withAnimation(.easeInOut(duration: 0.5).delay(0.2)) {
+                animate = true
+            }
+        }
+    }
 }
 
 // MARK: - Preview

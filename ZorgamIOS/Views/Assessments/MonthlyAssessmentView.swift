@@ -23,11 +23,23 @@ struct MonthlyAssessmentView: View {
                 ProgressView("Loading monthly assessment...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if allQuestions.isEmpty {
-                EmptyStateView(
-                    icon: "calendar",
-                    title: "No Monthly Assessment",
-                    message: "Unable to load monthly assessment questions."
-                )
+                VStack(spacing: 16) {
+                    Image(systemName: "calendar")
+                        .font(.system(size: 48))
+                        .foregroundColor(.gray)
+                    
+                    Text("No Monthly Assessment")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.primary)
+                    
+                    Text("Unable to load monthly assessment questions.")
+                        .font(.body)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 // Progress Header
                 VStack(spacing: 16) {
@@ -53,16 +65,21 @@ struct MonthlyAssessmentView: View {
                 .padding(.bottom, 20)
                 
                 // Question Content
-                if currentQuestionIndex < allQuestions.count {
-                        QuestionStepView(
-                            question: allQuestions[currentQuestionIndex],
-                            questionIndex: currentQuestionIndex,
-                            answer: Binding(
-                                get: { answers[allQuestions[currentQuestionIndex].key] ?? "" },
-                                set: { answers[allQuestions[currentQuestionIndex].key] = $0 }
+                ScrollView {
+                    VStack {
+                        if currentQuestionIndex < allQuestions.count {
+                            QuestionStepView(
+                                question: allQuestions[currentQuestionIndex],
+                                questionIndex: currentQuestionIndex,
+                                answer: Binding(
+                                    get: { answers[allQuestions[currentQuestionIndex].key] ?? "" },
+                                    set: { answers[allQuestions[currentQuestionIndex].key] = $0 }
+                                )
                             )
-                        )
-                    .padding(.horizontal, 20)
+                            .padding(.horizontal, 20)
+                        }
+                    }
+                    .padding(.bottom, 20)
                 }
                 
                 Spacer()
@@ -227,6 +244,9 @@ struct MonthlyAssessmentView: View {
                 receiveValue: { response in
                     print("✅ Questionnaire submitted successfully: \(response.id)")
                     showSuccessAlert = true
+                    
+                    // Post notification to trigger confetti animation
+                    NotificationCenter.default.post(name: .assessmentSubmittedSuccessfully, object: nil)
                 }
             )
             .store(in: &cancellables)

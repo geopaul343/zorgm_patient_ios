@@ -23,11 +23,23 @@ struct WeeklyAssessmentView: View {
                     ProgressView("Loading weekly assessment...")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if allQuestions.isEmpty {
-                    EmptyStateView(
-                        icon: "chart.bar.fill",
-                        title: "No Weekly Assessment",
-                    message: "Unable to load weekly assessment questions."
-                    )
+                    VStack(spacing: 16) {
+                        Image(systemName: "chart.bar.fill")
+                            .font(.system(size: 48))
+                            .foregroundColor(.gray)
+                        
+                        Text("No Weekly Assessment")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.primary)
+                        
+                        Text("Unable to load weekly assessment questions.")
+                            .font(.body)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                 // Progress Header
                 VStack(spacing: 16) {
@@ -53,40 +65,45 @@ struct WeeklyAssessmentView: View {
                 .padding(.bottom, 20)
                 
                 // Question Content
-                if currentQuestionIndex < allQuestions.count {
-                    // Custom UI for specific weekly questions
-                    if currentQuestionIndex == 1 {
-                        // Question 2: Show range options (0, 1-2, 3-5, 6-7)
-                        WeeklyRangeAnswerView(
-                            question: allQuestions[currentQuestionIndex],
-                            answer: Binding(
-                                get: { answers[allQuestions[currentQuestionIndex].key] ?? "" },
-                                set: { answers[allQuestions[currentQuestionIndex].key] = $0 }
-                            )
-                        )
-                        .padding(.horizontal, 20)
-                    } else if currentQuestionIndex == 2 {
-                        // Question 3: Show Yes/No answer box
-                        WeeklyYesNoAnswerView(
-                            question: allQuestions[currentQuestionIndex],
-                            answer: Binding(
-                                get: { answers[allQuestions[currentQuestionIndex].key] ?? "" },
-                                set: { answers[allQuestions[currentQuestionIndex].key] = $0 }
-                            )
-                        )
-                        .padding(.horizontal, 20)
-                    } else {
-                        // Default question view for other questions
-                        QuestionStepView(
-                            question: allQuestions[currentQuestionIndex],
-                            questionIndex: currentQuestionIndex,
-                            answer: Binding(
-                                get: { answers[allQuestions[currentQuestionIndex].key] ?? "" },
-                                set: { answers[allQuestions[currentQuestionIndex].key] = $0 }
-                            )
-                        )
-                        .padding(.horizontal, 20)
+                ScrollView {
+                    VStack {
+                        if currentQuestionIndex < allQuestions.count {
+                            // Custom UI for specific weekly questions
+                            if currentQuestionIndex == 1 {
+                                // Question 2: Show range options (0, 1-2, 3-5, 6-7)
+                                WeeklyRangeAnswerView(
+                                    question: allQuestions[currentQuestionIndex],
+                                    answer: Binding(
+                                        get: { answers[allQuestions[currentQuestionIndex].key] ?? "" },
+                                        set: { answers[allQuestions[currentQuestionIndex].key] = $0 }
+                                    )
+                                )
+                                .padding(.horizontal, 20)
+                            } else if currentQuestionIndex == 2 {
+                                // Question 3: Show Yes/No answer box
+                                WeeklyYesNoAnswerView(
+                                    question: allQuestions[currentQuestionIndex],
+                                    answer: Binding(
+                                        get: { answers[allQuestions[currentQuestionIndex].key] ?? "" },
+                                        set: { answers[allQuestions[currentQuestionIndex].key] = $0 }
+                                    )
+                                )
+                                .padding(.horizontal, 20)
+                            } else {
+                                // Default question view for other questions
+                                QuestionStepView(
+                                    question: allQuestions[currentQuestionIndex],
+                                    questionIndex: currentQuestionIndex,
+                                    answer: Binding(
+                                        get: { answers[allQuestions[currentQuestionIndex].key] ?? "" },
+                                        set: { answers[allQuestions[currentQuestionIndex].key] = $0 }
+                                    )
+                                )
+                                .padding(.horizontal, 20)
+                            }
+                        }
                     }
+                    .padding(.bottom, 20)
                 }
                 
                 Spacer()
@@ -251,6 +268,9 @@ struct WeeklyAssessmentView: View {
                 receiveValue: { response in
                     print("✅ Questionnaire submitted successfully: \(response.id)")
                     showSuccessAlert = true
+                    
+                    // Post notification to trigger confetti animation
+                    NotificationCenter.default.post(name: .assessmentSubmittedSuccessfully, object: nil)
                 }
             )
             .store(in: &cancellables)

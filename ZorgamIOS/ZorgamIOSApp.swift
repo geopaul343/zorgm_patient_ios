@@ -5,6 +5,7 @@ struct ZorgamIOSApp: App {
     // MARK: - Properties
     @StateObject private var sessionManager = SessionManager()
     @StateObject private var navigationManager = NavigationManager()
+    @AppStorage("isDarkMode") private var isDarkMode = false
     
     // MARK: - Body
     var body: some Scene {
@@ -12,6 +13,7 @@ struct ZorgamIOSApp: App {
             ContentView()
                 .environmentObject(sessionManager)
                 .environmentObject(navigationManager)
+                .preferredColorScheme(isDarkMode ? .dark : .light)
                 .onAppear {
                     // Initialize app services
                     setupApp()

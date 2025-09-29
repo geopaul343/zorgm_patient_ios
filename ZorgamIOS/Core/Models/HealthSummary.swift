@@ -83,6 +83,7 @@ struct PollenData: Codable {
 // MARK: - Dashboard Stats
 struct DashboardStats {
     let totalCheckIns: Int
+    let dailyCheckIns: Int
     let weeklyAssessments: Int
     let monthlyAssessments: Int
     let medicationCount: Int

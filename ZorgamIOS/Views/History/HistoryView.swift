@@ -6,27 +6,42 @@ struct HistoryView: View {
     // MARK: - State
     @StateObject private var viewModel = HistoryViewModel()
     @State private var showingSortOptions = false
-
+    @State private var refreshID = UUID()
+    @State private var forceUpdate = 0
+    @State private var currentSortOption: SortOption = .newestFirst
+    
+    // MARK: - Computed Properties
+    private var sortedItems: [HistoryItem] {
+        print("🔄 Computing sortedItems with \(viewModel.filteredHistoryItems.count) items")
+        return viewModel.filteredHistoryItems
+    }
     
     // MARK: - Body
     var body: some View {
+        let _ = print("🔄 HistoryView body computed - filteredHistoryItems count: \(viewModel.filteredHistoryItems.count)")
         NavigationView {
             VStack(spacing: 0) {
-                // Filter Section
-                FilterSection(
-                    selectedFilter: $viewModel.selectedFilter,
-                    onFilterSelected: { filter in
-                        viewModel.selectFilter(filter)
-                    }
-                )
+                // Fixed Header Section
+                VStack(spacing: 0) {
+                    // Filter Section
+                    FilterSection(
+                        selectedFilter: $viewModel.selectedFilter,
+                        onFilterSelected: { filter in
+                            viewModel.selectFilter(filter)
+                        }
+                    )
+                    .padding(.top, 8)
+                    
+                    // Sort Section
+                    SortSection(
+                        viewModel: viewModel,
+                        currentSortOption: $currentSortOption,
+                        showingSortOptions: $showingSortOptions
+                    )
+                }
+                .background(Color(.systemBackground))
                 
-                // Sort Section
-                SortSection(
-                    selectedSort: $viewModel.selectedSort,
-                    showingSortOptions: $showingSortOptions
-                )
-                
-                // Records List
+                // Scrollable Content Area
                 if viewModel.isLoading {
                     LoadingView()
                 } else if let errorMessage = viewModel.errorMessage {
@@ -35,32 +50,65 @@ struct HistoryView: View {
                             await viewModel.refreshData()
                         }
                     }
-                } else if viewModel.filteredRecords.isEmpty {
+                } else if viewModel.filteredHistoryItems.isEmpty {
                     EmptyStateView {
                         Task {
                             await viewModel.refreshData()
                         }
                     }
                 } else {
-                    RecordsListView(records: viewModel.filteredRecords)
-
+                    ScrollView {
+                        VStack(spacing: 12) {
+                            ForEach(viewModel.filteredHistoryItems, id: \.id) { historyItem in
+                                CheckInRecordCard(
+                                    record: historyItem.record,
+                                    submission: historyItem.submission
+                                )
+                            }
+                        }
+                        .padding(.horizontal)
+                        .padding(.bottom, 20)
+                    }
+                    .id("records-\(viewModel.filteredHistoryItems.count)-\(viewModel.selectedSort.rawValue)-\(refreshID)-\(forceUpdate)")
+                    .refreshable {
+                        await viewModel.refreshData()
+                    }
+                    .onAppear {
+                        print("📱 RecordsListView appeared with \(viewModel.filteredHistoryItems.count) items")
+                    }
+                    .onChange(of: viewModel.filteredHistoryItems) { newItems in
+                        print("📱 RecordsListView onChange: \(newItems.count) items")
+                    }
+                    .onChange(of: viewModel.selectedSort) { newSort in
+                        print("📱 RecordsListView sort changed to: \(newSort.displayName)")
+                        // Force UI update by changing the ID
+                        refreshID = UUID()
+                        forceUpdate += 1
+                    }
+                    .onChange(of: viewModel.selectedFilter) { newFilter in
+                        print("📱 RecordsListView filter changed to: \(newFilter.displayName)")
+                        // Force UI update by changing the ID
+                        refreshID = UUID()
+                        forceUpdate += 1
+                    }
                 }
             }
             .navigationTitle("History")
             .navigationBarTitleDisplayMode(.large)
-            .refreshable {
-                await viewModel.refreshData()
-
-            }
         }
         .onAppear {
+            // Reset filter to "All" when navigating back to history page
+            viewModel.selectedFilter = .all
+            print("🔄 HistoryView appeared - reset filter to 'All'")
+            
             Task {
-                await viewModel.loadData()
+                await viewModel.loadData(sortBy: viewModel.getSortByParameter(), sortOrder: viewModel.getSortOrderParameter())
             }
         }
         .sheet(isPresented: $showingSortOptions) {
             SortOptionsSheet(
-                selectedSort: $viewModel.selectedSort,
+                viewModel: viewModel,
+                currentSortOption: $currentSortOption,
                 isPresented: $showingSortOptions
             )
         }
@@ -73,7 +121,7 @@ struct FilterSection: View {
     let onFilterSelected: (FilterType) -> Void
     
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: true) {
+        ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
                 ForEach(FilterType.allCases, id: \.self) { filter in
                     FilterButton(
@@ -85,12 +133,15 @@ struct FilterSection: View {
                     )
                 }
             }
-            .padding(.horizontal)
-            .padding(.vertical, 4)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
         }
         .scrollIndicators(.hidden)
-        .frame(height: 50)
+        .frame(height: 60)
         .clipped()
+//        .background(Color.red)
+        .scrollDisabled(false)
+        .scrollBounceBehavior(.basedOnSize)
     }
 }
 
@@ -116,12 +167,14 @@ struct FilterButton: View {
         .buttonStyle(PlainButtonStyle())
         .frame(minWidth: 60, maxWidth: 120)
         .fixedSize(horizontal: true, vertical: false)
+        .contentShape(Rectangle())
     }
 }
 
 // MARK: - Sort Section
 struct SortSection: View {
-    @Binding var selectedSort: SortOption
+    let viewModel: HistoryViewModel
+    @Binding var currentSortOption: SortOption
     @Binding var showingSortOptions: Bool
     
     var body: some View {
@@ -130,9 +183,13 @@ struct SortSection: View {
                 showingSortOptions = true
             }) {
                 HStack {
-                    Text("Sort by: \(selectedSort.displayName)")
+                    Text("Sort by: \(currentSortOption.displayName)")
                         .font(.subheadline)
                         .foregroundColor(.primary)
+                        .id("sort-label-\(currentSortOption.rawValue)") // Force view update when sort changes
+                        .onAppear {
+                            print("🔄 SortSection UI updated - currentSortOption: \(currentSortOption.displayName)")
+                        }
                     
                     Spacer()
                     
@@ -148,67 +205,85 @@ struct SortSection: View {
                 )
             }
             .buttonStyle(PlainButtonStyle())
+            .onChange(of: viewModel.selectedSort) { newSort in
+                print("🔄 SortSection onChange triggered - newSort: \(newSort.displayName)")
+                currentSortOption = newSort
+            }
             
             Spacer()
         }
-        .padding(.horizontal)
+        .padding(.horizontal, 16)
         .padding(.vertical, 8)
+        .background(Color(.systemBackground))
     }
 }
 
-// MARK: - Records List View
-struct RecordsListView: View {
-    let records: [CheckInRecord]
-    
-    var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 12) {
-                ForEach(records) { record in
-                    CheckInRecordCard(record: record)
-                }
-            }
-            .padding(.horizontal)
-            .padding(.bottom, 20)
-        }
-    }
-}
 
 // MARK: - Check-in Record Card
 struct CheckInRecordCard: View {
     let record: CheckInRecord
+    let submission: SubmissionResponses?
+    @State private var showingDetail = false
     
     var body: some View {
-        HStack(spacing: 16) {
-            // Calendar Icon
-            Image(systemName: "calendar")
-                .font(.title2)
-                .foregroundColor(.blue)
-                .frame(width: 30, height: 30)
-                .background(Color.blue.opacity(0.1))
-     .clipShape(Circle())
-            
-            // Content
-            VStack(alignment: .leading, spacing: 4) {
-
-                Text("Check-in: \(record.type.displayName)")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                
-                Text("Submitted on: \(record.submittedAt, formatter: dateFormatter)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-
+        Button(action: {
+            if submission != nil {
+                showingDetail = true
             }
-            
-            Spacer()
-            
-            // Status Badge
-            StatusBadge(status: record.status)
+        }) {
+            HStack(spacing: 16) {
+                // Calendar Icon
+                Image(systemName: "calendar")
+                    .font(.title2)
+                    .foregroundColor(.blue)
+                    .frame(width: 30, height: 30)
+                    .background(Color.blue.opacity(0.1))
+                    .clipShape(Circle())
+                
+                // Content
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Check-in: \(record.type.displayName)")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    
+                    if let submission = submission {
+                        Text("Submitted on: \(formatAPIDate(submission.submittedAt))")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    } else {
+                        Text("Submitted on: \(record.submittedAt, formatter: dateFormatter)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                
+                Spacer()
+                
+                // Status Badge - Use API status if available
+                if let submission = submission {
+                    StatusBadge(status: CheckInStatus.fromString(submission.status))
+                } else {
+                    StatusBadge(status: record.status)
+                }
+                
+                // Navigation Arrow
+                if submission != nil {
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .padding()
+            .background(Color(.systemBackground))
+            .cornerRadius(12)
+            .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
         }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
+        .buttonStyle(PlainButtonStyle())
+        .sheet(isPresented: $showingDetail) {
+            if let submission = submission {
+                HistoryDetailView(submission: submission)
+            }
+        }
     }
     
     private let dateFormatter: DateFormatter = {
@@ -216,6 +291,22 @@ struct CheckInRecordCard: View {
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
         return formatter
     }()
+    
+    private let apiDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM dd, yyyy 'at' h:mm a"
+        return formatter
+    }()
+    
+    private func formatAPIDate(_ dateString: String) -> String {
+        let iso8601Formatter = ISO8601DateFormatter()
+        if let date = iso8601Formatter.date(from: dateString) {
+            return apiDateFormatter.string(from: date)
+        } else {
+            // Fallback to original string if parsing fails
+            return dateString
+        }
+    }
 }
 
 // MARK: - Status Badge
@@ -233,6 +324,9 @@ struct StatusBadge: View {
                 RoundedRectangle(cornerRadius: 12)
                     .fill(statusColor)
             )
+            .onAppear {
+                print("🔍 StatusBadge displaying: \(status.displayName)")
+            }
     }
     
     private var statusColor: Color {
@@ -251,7 +345,8 @@ struct StatusBadge: View {
 
 // MARK: - Sort Options Sheet
 struct SortOptionsSheet: View {
-    @Binding var selectedSort: SortOption
+    let viewModel: HistoryViewModel
+    @Binding var currentSortOption: SortOption
     @Binding var isPresented: Bool
     
     var body: some View {
@@ -259,7 +354,8 @@ struct SortOptionsSheet: View {
             List {
                 ForEach(SortOption.allCases, id: \.self) { option in
                     Button(action: {
-                        selectedSort = option
+                        viewModel.selectSort(option)
+                        currentSortOption = option
                         isPresented = false
                     }) {
                         HStack {
@@ -268,7 +364,7 @@ struct SortOptionsSheet: View {
                             
                             Spacer()
                             
-                            if selectedSort == option {
+                            if currentSortOption == option {
                                 Image(systemName: "checkmark")
                                     .foregroundColor(.blue)
                             }

@@ -14,7 +14,6 @@
 		A1234567890123456789013A /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013B /* SessionManager.swift */; };
 		A1234567890123456789013C /* NavigationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013D /* NavigationManager.swift */; };
 		A1234567890123456789013E /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013F /* APIService.swift */; };
-		A1234567890123456789016A /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789016B /* NotificationService.swift */; };
 		A1234567890123456789013G /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013H /* User.swift */; };
 		A1234567890123456789013I /* HealthAssessment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013J /* HealthAssessment.swift */; };
 		A1234567890123456789013K /* HealthSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789013L /* HealthSummary.swift */; };
@@ -30,15 +29,20 @@
 		A1234567890123456789014E /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789014F /* MainTabView.swift */; };
 		A1234567890123456789014G /* MedicationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789014H /* MedicationsView.swift */; };
 		A1234567890123456789014I /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789014J /* SettingsView.swift */; };
-		A1234567890123456789014K /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789014L /* WelcomeView.swift */; };
+		A1234567890123456789014K /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789014L /* ProfileView.swift */; };
+		A1234567890123456789014M /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789014N /* WelcomeView.swift */; };
 		A1234567890123456789015A /* CheckInRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015B /* CheckInRecord.swift */; };
 		A1234567890123456789015C /* HistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015D /* HistoryViewModel.swift */; };
 		A1234567890123456789015E /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015F /* HistoryView.swift */; };
-		A1234567890123456789015B /* DailyAssessmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015C /* DailyAssessmentView.swift */; };
-		A1234567890123456789015D /* WeeklyAssessmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015E /* WeeklyAssessmentView.swift */; };
-		A1234567890123456789015F /* MonthlyAssessmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015G /* MonthlyAssessmentView.swift */; };
-		A1234567890123456789015H /* Questionnaire.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015I /* Questionnaire.swift */; };
-		A1234567890123456789015J /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015K /* WeatherService.swift */; };
+		A1234567890123456789015G /* DailyAssessmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015H /* DailyAssessmentView.swift */; };
+		A1234567890123456789015I /* WeeklyAssessmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015J /* WeeklyAssessmentView.swift */; };
+		A1234567890123456789015K /* MonthlyAssessmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015L /* MonthlyAssessmentView.swift */; };
+		A1234567890123456789015M /* Questionnaire.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015N /* Questionnaire.swift */; };
+		A1234567890123456789015O /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789015P /* WeatherService.swift */; };
+		A1234567890123456789016A /* HistoryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789016B /* HistoryDetailView.swift */; };
+		A1234567890123456789016C /* HistoryDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789016D /* HistoryDetail.swift */; };
+		A1234567890123456789016E /* HistoryDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890123456789016F /* HistoryDetailViewModel.swift */; };
+		FA3BF77A2E85103A0086B1BD /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3BF7792E85103A0086B1BD /* NotificationService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,7 +54,6 @@
 		A1234567890123456789013B /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		A1234567890123456789013D /* NavigationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationManager.swift; sourceTree = "<group>"; };
 		A1234567890123456789013F /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
-		A1234567890123456789016B /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		A1234567890123456789013H /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		A1234567890123456789013J /* HealthAssessment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthAssessment.swift; sourceTree = "<group>"; };
 		A1234567890123456789013L /* HealthSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthSummary.swift; sourceTree = "<group>"; };
@@ -66,16 +69,21 @@
 		A1234567890123456789014F /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		A1234567890123456789014H /* MedicationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicationsView.swift; sourceTree = "<group>"; };
 		A1234567890123456789014J /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		A1234567890123456789014L /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+		A1234567890123456789014L /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		A1234567890123456789014N /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		A1234567890123456789015B /* CheckInRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckInRecord.swift; sourceTree = "<group>"; };
 		A1234567890123456789015D /* HistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewModel.swift; sourceTree = "<group>"; };
 		A1234567890123456789015F /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		A1234567890123456789015H /* DailyAssessmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAssessmentView.swift; sourceTree = "<group>"; };
+		A1234567890123456789015J /* WeeklyAssessmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyAssessmentView.swift; sourceTree = "<group>"; };
+		A1234567890123456789015L /* MonthlyAssessmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyAssessmentView.swift; sourceTree = "<group>"; };
+		A1234567890123456789015N /* Questionnaire.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Questionnaire.swift; sourceTree = "<group>"; };
+		A1234567890123456789015P /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
+		A1234567890123456789016B /* HistoryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryDetailView.swift; sourceTree = "<group>"; };
+		A1234567890123456789016D /* HistoryDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryDetail.swift; sourceTree = "<group>"; };
+		A1234567890123456789016F /* HistoryDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryDetailViewModel.swift; sourceTree = "<group>"; };
+		FA3BF7792E85103A0086B1BD /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		FAA3B0C32E7A7ABF0045672E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		A1234567890123456789015C /* DailyAssessmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAssessmentView.swift; sourceTree = "<group>"; };
-		A1234567890123456789015E /* WeeklyAssessmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyAssessmentView.swift; sourceTree = "<group>"; };
-		A1234567890123456789015G /* MonthlyAssessmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyAssessmentView.swift; sourceTree = "<group>"; };
-		A1234567890123456789015I /* Questionnaire.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Questionnaire.swift; sourceTree = "<group>"; };
-		A1234567890123456789015K /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,9 +103,9 @@
 				FAA3B0C32E7A7ABF0045672E /* Info.plist */,
 				A1234567890123456789012B /* ZorgamIOSApp.swift */,
 				A1234567890123456789012D /* ContentView.swift */,
-				A1234567890123456789014M /* Core */,
-				A1234567890123456789014N /* ViewModels */,
-				A1234567890123456789014O /* Views */,
+				A1234567890123456789014Q /* Core */,
+				A1234567890123456789014R /* ViewModels */,
+				A1234567890123456789014S /* Views */,
 				A1234567890123456789012F /* Assets.xcassets */,
 				A1234567890123456789012L /* Preview Content */,
 			);
@@ -128,45 +136,44 @@
 			);
 			sourceTree = "<group>";
 		};
-		A1234567890123456789014M /* Core */ = {
+		A1234567890123456789014Q /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				A1234567890123456789014P /* Models */,
-				A1234567890123456789014Q /* Services */,
+				A1234567890123456789014T /* Models */,
+				A1234567890123456789014U /* Services */,
 			);
 			path = Core;
 			sourceTree = "<group>";
 		};
-		A1234567890123456789014N /* ViewModels */ = {
+		A1234567890123456789014R /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
 				A1234567890123456789013P /* AssessmentsViewModel.swift */,
 				A1234567890123456789013R /* AssessmentDetailViewModel.swift */,
 				A1234567890123456789013T /* DashboardViewModel.swift */,
-				A1234567890123456789015A /* HistoryViewModel.swift */,
+				A1234567890123456789015D /* HistoryViewModel.swift */,
+				A1234567890123456789016F /* HistoryDetailViewModel.swift */,
 				A1234567890123456789013V /* MedicationsViewModel.swift */,
 				A1234567890123456789013X /* WelcomeViewModel.swift */,
-				A1234567890123456789015D /* HistoryViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
 		};
-		A1234567890123456789014O /* Views */ = {
+		A1234567890123456789014S /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				ECEE04802E795BB900429D35 /* History */,
-				A1234567890123456789014R /* Assessments */,
-				A1234567890123456789014S /* Dashboard */,
-				A1234567890123456789015G /* History */,
-				A1234567890123456789014T /* Main */,
-				A1234567890123456789014U /* Medications */,
-				A1234567890123456789014V /* Settings */,
-				A1234567890123456789014W /* Welcome */,
+				A1234567890123456789014V /* Assessments */,
+				A1234567890123456789014W /* Dashboard */,
+				A1234567890123456789014X /* History */,
+				A1234567890123456789014Y /* Main */,
+				A1234567890123456789014Z /* Medications */,
+				A1234567890123456789015Q /* Settings */,
+				A1234567890123456789015R /* Welcome */,
 			);
 			path = Views;
 			sourceTree = "<group>";
 		};
-		A1234567890123456789014P /* Models */ = {
+		A1234567890123456789014T /* Models */ = {
 			isa = PBXGroup;
 			children = (
 				A1234567890123456789013H /* User.swift */,
@@ -174,36 +181,37 @@
 				A1234567890123456789013L /* HealthSummary.swift */,
 				A1234567890123456789013N /* Medication.swift */,
 				A1234567890123456789015B /* CheckInRecord.swift */,
-				A1234567890123456789015I /* Questionnaire.swift */,
+				A1234567890123456789016D /* HistoryDetail.swift */,
+				A1234567890123456789015N /* Questionnaire.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
 		};
-		A1234567890123456789014Q /* Services */ = {
+		A1234567890123456789014U /* Services */ = {
 			isa = PBXGroup;
 			children = (
 				A1234567890123456789013B /* SessionManager.swift */,
 				A1234567890123456789013D /* NavigationManager.swift */,
+				FA3BF7792E85103A0086B1BD /* NotificationService.swift */,
 				A1234567890123456789013F /* APIService.swift */,
-				A1234567890123456789016B /* NotificationService.swift */,
-				A1234567890123456789015K /* WeatherService.swift */,
+				A1234567890123456789015P /* WeatherService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
 		};
-		A1234567890123456789014R /* Assessments */ = {
+		A1234567890123456789014V /* Assessments */ = {
 			isa = PBXGroup;
 			children = (
 				A1234567890123456789013Z /* AssessmentDetailView.swift */,
 				A1234567890123456789014B /* AssessmentsView.swift */,
-				A1234567890123456789015C /* DailyAssessmentView.swift */,
-				A1234567890123456789015E /* WeeklyAssessmentView.swift */,
-				A1234567890123456789015G /* MonthlyAssessmentView.swift */,
+				A1234567890123456789015H /* DailyAssessmentView.swift */,
+				A1234567890123456789015J /* WeeklyAssessmentView.swift */,
+				A1234567890123456789015L /* MonthlyAssessmentView.swift */,
 			);
 			path = Assessments;
 			sourceTree = "<group>";
 		};
-		A1234567890123456789014S /* Dashboard */ = {
+		A1234567890123456789014W /* Dashboard */ = {
 			isa = PBXGroup;
 			children = (
 				A1234567890123456789014D /* DashboardView.swift */,
@@ -211,7 +219,16 @@
 			path = Dashboard;
 			sourceTree = "<group>";
 		};
-		A1234567890123456789014T /* Main */ = {
+		A1234567890123456789014X /* History */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890123456789015F /* HistoryView.swift */,
+				A1234567890123456789016B /* HistoryDetailView.swift */,
+			);
+			path = History;
+			sourceTree = "<group>";
+		};
+		A1234567890123456789014Y /* Main */ = {
 			isa = PBXGroup;
 			children = (
 				A1234567890123456789014F /* MainTabView.swift */,
@@ -219,7 +236,7 @@
 			path = Main;
 			sourceTree = "<group>";
 		};
-		A1234567890123456789014U /* Medications */ = {
+		A1234567890123456789014Z /* Medications */ = {
 			isa = PBXGroup;
 			children = (
 				A1234567890123456789014H /* MedicationsView.swift */,
@@ -227,29 +244,21 @@
 			path = Medications;
 			sourceTree = "<group>";
 		};
-		A1234567890123456789014V /* Settings */ = {
+		A1234567890123456789015Q /* Settings */ = {
 			isa = PBXGroup;
 			children = (
 				A1234567890123456789014J /* SettingsView.swift */,
+				A1234567890123456789014L /* ProfileView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
 		};
-		A1234567890123456789014W /* Welcome */ = {
+		A1234567890123456789015R /* Welcome */ = {
 			isa = PBXGroup;
 			children = (
-				A1234567890123456789014L /* WelcomeView.swift */,
+				A1234567890123456789014N /* WelcomeView.swift */,
 			);
 			path = Welcome;
-			sourceTree = "<group>";
-		};
-		A1234567890123456789015G /* History */ = {
-			isa = PBXGroup;
-			children = (
-				A1234567890123456789015F /* HistoryView.swift */,
-
-			);
-			path = History;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -327,32 +336,36 @@
 				A1234567890123456789013A /* SessionManager.swift in Sources */,
 				A1234567890123456789013C /* NavigationManager.swift in Sources */,
 				A1234567890123456789013E /* APIService.swift in Sources */,
-				A1234567890123456789016A /* NotificationService.swift in Sources */,
-				ECEE04812E795BB900429D35 /* HistoryView.swift in Sources */,
+				A1234567890123456789016A /* HistoryDetailView.swift in Sources */,
 				A1234567890123456789013G /* User.swift in Sources */,
 				A1234567890123456789013I /* HealthAssessment.swift in Sources */,
 				A1234567890123456789013K /* HealthSummary.swift in Sources */,
 				A1234567890123456789013M /* Medication.swift in Sources */,
 				A1234567890123456789015A /* CheckInRecord.swift in Sources */,
+				A1234567890123456789016C /* HistoryDetail.swift in Sources */,
+				A1234567890123456789015C /* HistoryViewModel.swift in Sources */,
+				A1234567890123456789016E /* HistoryDetailViewModel.swift in Sources */,
+				A1234567890123456789015E /* HistoryView.swift in Sources */,
+				A1234567890123456789016A /* HistoryDetailView.swift in Sources */,
 				A1234567890123456789013O /* AssessmentsViewModel.swift in Sources */,
 				A1234567890123456789013Q /* AssessmentDetailViewModel.swift in Sources */,
 				A1234567890123456789013S /* DashboardViewModel.swift in Sources */,
 				A1234567890123456789013U /* MedicationsViewModel.swift in Sources */,
 				A1234567890123456789013W /* WelcomeViewModel.swift in Sources */,
-				A1234567890123456789015C /* HistoryViewModel.swift in Sources */,
 				A1234567890123456789013Y /* AssessmentDetailView.swift in Sources */,
 				A1234567890123456789014A /* AssessmentsView.swift in Sources */,
-				A1234567890123456789015B /* DailyAssessmentView.swift in Sources */,
-				A1234567890123456789015D /* WeeklyAssessmentView.swift in Sources */,
-				A1234567890123456789015F /* MonthlyAssessmentView.swift in Sources */,
-				A1234567890123456789015H /* Questionnaire.swift in Sources */,
-				A1234567890123456789015J /* WeatherService.swift in Sources */,
+				A1234567890123456789015G /* DailyAssessmentView.swift in Sources */,
+				A1234567890123456789015I /* WeeklyAssessmentView.swift in Sources */,
+				A1234567890123456789015K /* MonthlyAssessmentView.swift in Sources */,
+				FA3BF77A2E85103A0086B1BD /* NotificationService.swift in Sources */,
+				A1234567890123456789015M /* Questionnaire.swift in Sources */,
+				A1234567890123456789015O /* WeatherService.swift in Sources */,
 				A1234567890123456789014C /* DashboardView.swift in Sources */,
 				A1234567890123456789014E /* MainTabView.swift in Sources */,
 				A1234567890123456789014G /* MedicationsView.swift in Sources */,
 				A1234567890123456789014I /* SettingsView.swift in Sources */,
-				A1234567890123456789014K /* WelcomeView.swift in Sources */,
-				A1234567890123456789015E /* HistoryView.swift in Sources */,
+				A1234567890123456789014K /* ProfileView.swift in Sources */,
+				A1234567890123456789014M /* WelcomeView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -493,12 +506,12 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ZorgamIOS/Info.plist;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app needs location access to provide accurate weather and air quality data for your area.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app needs location access to provide accurate weather and air quality data for your area.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -507,6 +520,10 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.geo.zorgam.ZorgamIOS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -526,12 +543,12 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ZorgamIOS/Info.plist;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app needs location access to provide accurate weather and air quality data for your area.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app needs location access to provide accurate weather and air quality data for your area.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -540,6 +557,10 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.geo.zorgam.ZorgamIOS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

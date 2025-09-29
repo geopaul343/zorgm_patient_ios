@@ -39,8 +39,19 @@ struct CheckInRecord: Identifiable, Codable {
     }
 }
 
+// MARK: - CheckInRecord + Equatable
+extension CheckInRecord: Equatable {
+    static func == (lhs: CheckInRecord, rhs: CheckInRecord) -> Bool {
+        return lhs.id == rhs.id &&
+               lhs.type == rhs.type &&
+               lhs.submittedAt == rhs.submittedAt &&
+               lhs.status == rhs.status &&
+               NSDictionary(dictionary: lhs.responses).isEqual(to: rhs.responses)
+    }
+}
+
 // MARK: - Check-in Type
-enum CheckInType: String, CaseIterable, Codable {
+enum CheckInType: String, CaseIterable, Codable, Equatable {
     case daily = "Daily"
     case weekly = "Weekly"
     case monthly = "Monthly"
@@ -66,7 +77,7 @@ enum CheckInType: String, CaseIterable, Codable {
 }
 
 // MARK: - Check-in Status
-enum CheckInStatus: String, CaseIterable, Codable {
+enum CheckInStatus: String, CaseIterable, Codable, Equatable {
     case completed = "Completed"
     case pending = "Pending"
     case inProgress = "In Progress"
@@ -87,7 +98,7 @@ enum CheckInStatus: String, CaseIterable, Codable {
 }
 
 // MARK: - Filter Type
-enum FilterType: String, CaseIterable {
+enum FilterType: String, CaseIterable, Equatable {
     case all = "All"
     case daily = "Daily"
     case weekly = "Weekly"
@@ -106,7 +117,7 @@ enum FilterType: String, CaseIterable {
 }
 
 // MARK: - Sort Option
-enum SortOption: String, CaseIterable {
+enum SortOption: String, CaseIterable, Equatable {
     case newestFirst = "Newest first"
     case oldestFirst = "Oldest first"
     case typeAscending = "Type A-Z"

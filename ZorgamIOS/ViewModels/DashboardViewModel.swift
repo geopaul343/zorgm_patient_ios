@@ -9,6 +9,11 @@ class DashboardViewModel: ObservableObject {
     @Published var stats: DashboardStats?
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
+    @Published var totalPoints: Int = 0
+    @Published var pointsEarned: Int = 0
+    @Published var showConfetti: Bool = false
+    @Published var showPointsPopup: Bool = false
+    @Published var isInitialLoadComplete: Bool = false
     
     // MARK: - Private Properties
     private let apiService = APIService()
@@ -25,15 +30,20 @@ class DashboardViewModel: ObservableObject {
         // Load dashboard stats first (this is fast)
         await loadDashboardStats()
         
-        // Try to load health summary and weather data, but don't fail if they're too large
-        await loadHealthSummary()
+        // Load points
+        await loadPoints()
+        
+        // Load weather data
         await loadWeatherData()
         
         isLoading = false
+        isInitialLoadComplete = true
     }
     
     @MainActor
     func refreshData() async {
+        // Clear weather cache to force fresh data on manual refresh
+        weatherService.clearCache()
         await loadData()
     }
     
@@ -41,20 +51,42 @@ class DashboardViewModel: ObservableObject {
         // Stop any existing timer
         stopAutoRefresh()
         
-        // Start new timer for every 5 minutes (300 seconds)
-        refreshTimer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { [weak self] _ in
+        // Start new timer for every 30 minutes (1800 seconds) to check if cache needs refresh
+        refreshTimer = Timer.scheduledTimer(withTimeInterval: 1800, repeats: true) { [weak self] _ in
             Task { @MainActor in
-                print("🔄 Auto-refreshing weather data...")
-                await self?.loadWeatherData()
+                print("🔄 Auto-refresh check for weather data...")
+                await self?.refreshWeatherDataIfNeeded()
             }
         }
-        print("⏰ Auto-refresh timer started (every 5 minutes)")
+        print("⏰ Auto-refresh timer started (every 30 minutes)")
+    }
+    
+    @MainActor
+    private func refreshWeatherDataIfNeeded() async {
+        // Only refresh if we don't have cached data or it's expired
+        if weatherService.getCachedWeather() == nil {
+            print("🔄 No cached weather data, refreshing...")
+            await loadWeatherData()
+        } else {
+            print("🔄 Weather data is still fresh, skipping refresh")
+        }
     }
     
     func stopAutoRefresh() {
         refreshTimer?.invalidate()
         refreshTimer = nil
         print("⏹️ Auto-refresh timer stopped")
+    }
+    
+    init() {
+        // Listen for assessment submission notifications
+        NotificationCenter.default.publisher(for: .assessmentSubmittedSuccessfully)
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    await self?.triggerConfettiAndUpdatePoints()
+                }
+            }
+            .store(in: &cancellables)
     }
     
     deinit {
@@ -68,56 +100,29 @@ class DashboardViewModel: ObservableObject {
         await loadWeatherData()
     }
     
+    // MARK: - Cache Management
+    func getCacheStatus() -> String {
+        if let cachedWeather = weatherService.getCachedWeather() {
+            return "✅ Weather data cached and valid"
+        } else {
+            return "❌ No valid weather cache"
+        }
+    }
+    
     // MARK: - Private Methods
-    @MainActor
-    private func loadHealthSummary() async {
-        print("🔄 Loading health summary from API...")
-        apiService.getHealthSummary()
-            .receive(on: DispatchQueue.main)
-            .sink(
-                receiveCompletion: { [weak self] result in
-                    switch result {
-                    case .finished:
-                        print("✅ Health summary API call completed successfully")
-                    case .failure(let error):
-                        print("❌ Health summary API call failed: \(error.localizedDescription)")
-                        // Always fall back to mock data for now
-                        self?.loadMockHealthSummary()
-                    }
-                },
-                receiveValue: { [weak self] summary in
-                    print("📊 Health summary received: \(summary)")
-                    self?.healthSummary = summary
-                }
-            )
-            .store(in: &cancellables)
-    }
-
-    @MainActor
-    private func loadMockHealthSummary() {
-        healthSummary = HealthSummary(
-            checkInsCompleted: 12,
-            totalCheckIns: 22,
-            mmrcStatus: "Good",
-            phq2Status: "Normal",
-            pointsEarned: 150,
-            lastCheckInDate: "2025-09-16T10:30:00Z",
-            weeklyProgress: WeeklyProgress(
-                daily: 12,
-                weekly: 45,
-                monthly: 22
-            ),
-            monthlyProgress: MonthlyProgress(
-                completed: 22,
-                total: 30,
-                percentage: 73.3
-            )
-        )
-    }
     
     @MainActor
     private func loadWeatherData() async {
-        print("🌤️ Loading weather data from API...")
+        print("🌤️ Loading weather data...")
+        
+        // First, try to get cached weather data
+        if let cachedWeather = weatherService.getCachedWeather() {
+            print("🌤️ Using cached weather data")
+            self.weather = cachedWeather
+            return
+        }
+        
+        print("🌤️ No valid cache, fetching from API...")
         
         // Request location permission
         weatherService.requestLocationPermission()
@@ -239,13 +244,138 @@ class DashboardViewModel: ObservableObject {
     
     @MainActor
     private func loadDashboardStats() async {
-        // For now, create mock stats
-        // In a real app, this would come from the API
-        stats = DashboardStats(
-            totalCheckIns: 15,
-            weeklyAssessments: 3,
-            monthlyAssessments: 1,
-            medicationCount: 5
+        print("📊 Loading dashboard stats from submissions...")
+        
+        return await withCheckedContinuation { continuation in
+            apiService.getSubmissions()
+                .receive(on: DispatchQueue.main)
+                .sink(
+                    receiveCompletion: { completion in
+                        if case .failure(let error) = completion {
+                            print("❌ Failed to load submissions: \(error)")
+                            // Fallback to mock data
+                            self.stats = DashboardStats(
+                                totalCheckIns: 0,
+                                dailyCheckIns: 0,
+                                weeklyAssessments: 0,
+                                monthlyAssessments: 0,
+                                medicationCount: 0
+                            )
+                        }
+                        continuation.resume()
+                    },
+                    receiveValue: { submissions in
+                        print("✅ Submissions loaded successfully: \(submissions.count) total")
+                        self.stats = self.calculateStatsFromSubmissions(submissions)
+                    }
+                )
+                .store(in: &cancellables)
+        }
+    }
+    
+    private func calculateStatsFromSubmissions(_ submissions: [SubmissionResponses]) -> DashboardStats {
+        var dailyCount = 0
+        var weeklyCount = 0
+        var monthlyCount = 0
+        var oneTimeCount = 0
+        
+        print("🔍 Processing \(submissions.count) submissions...")
+        
+        for submission in submissions {
+            let checkinType = submission.checkinType.lowercased()
+            print("📋 Processing submission ID: \(submission.id), Check-in Type: '\(checkinType)'")
+            
+            switch checkinType {
+            case "daily":
+                dailyCount += 1
+                print("  ✅ Counted as daily")
+            case "weekly":
+                weeklyCount += 1
+                print("  ✅ Counted as weekly")
+            case "monthly":
+                monthlyCount += 1
+                print("  ✅ Counted as monthly")
+            case "one_time":
+                oneTimeCount += 1
+                print("  ⏭️ Skipped one_time submission")
+            default:
+                // Count unknown types as daily for now
+                dailyCount += 1
+                print("  ⚠️ Unknown check-in type '\(submission.checkinType)' counted as daily")
+            }
+        }
+        
+        let totalCheckIns = dailyCount + weeklyCount + monthlyCount
+        
+        print("📊 Final calculated stats:")
+        print("  📅 Daily: \(dailyCount)")
+        print("  📊 Weekly: \(weeklyCount)")
+        print("  📆 Monthly: \(monthlyCount)")
+        print("  ⏭️ One-time (excluded): \(oneTimeCount)")
+        print("  📈 Total (excluding one-time): \(totalCheckIns)")
+        
+        return DashboardStats(
+            totalCheckIns: totalCheckIns,
+            dailyCheckIns: dailyCount,
+            weeklyAssessments: weeklyCount,
+            monthlyAssessments: monthlyCount,
+            medicationCount: 0 // This will be loaded separately if needed
         )
     }
+    
+    @MainActor
+    private func loadPoints() async {
+        return await withCheckedContinuation { continuation in
+            apiService.getMyTotalPoints()
+                .receive(on: DispatchQueue.main)
+                .sink(
+                    receiveCompletion: { completion in
+                        if case .failure(let error) = completion {
+                            print("❌ Failed to load points: \(error)")
+                            // Set default points if API fails
+                            self.totalPoints = 1250
+                        }
+                        continuation.resume()
+                    },
+                    receiveValue: { points in
+                        print("✅ Points loaded successfully: \(points)")
+                        self.totalPoints = points
+                    }
+                )
+                .store(in: &cancellables)
+        }
+    }
+    
+    @MainActor
+    func triggerConfettiAndUpdatePoints() async {
+        // Only show confetti if initial load is complete
+        guard isInitialLoadComplete else { return }
+        
+        // Store previous points to calculate earned points
+        let previousPoints = totalPoints
+        
+        // Load updated points and dashboard stats
+        print("🔄 Refreshing dashboard stats after assessment submission...")
+        await loadPoints()
+        await loadDashboardStats()
+        print("✅ Dashboard stats refreshed successfully")
+        
+        // Calculate points earned (difference between new and old points)
+        pointsEarned = max(0, totalPoints - previousPoints)
+        
+        // Show confetti animation and points popup
+        showConfetti = true
+        showPointsPopup = true
+        
+        // Hide confetti after animation duration
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            self.showConfetti = false
+        }
+        
+        // Hide points popup after a longer duration
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
+            self.showPointsPopup = false
+        }
+    }
 }
+

@@ -3,7 +3,7 @@ import UserNotifications
 import UIKit
 import AVFoundation
 
-class NotificationService: NSObject, ObservableObject, UNUserNotificationCenterDelegate {
+public class NotificationService: NSObject, ObservableObject, UNUserNotificationCenterDelegate {
     static let shared = NotificationService()
     
     private override init() {
@@ -984,7 +984,7 @@ extension NotificationService {
 // MARK: - UNUserNotificationCenterDelegate
 extension NotificationService {
     // Handle notification when app is in foreground
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         DispatchQueue.main.async {
             print("🔔 Notification received in foreground: \(notification.request.content.title)")
             
@@ -1001,7 +1001,7 @@ extension NotificationService {
     }
     
     // Handle notification actions
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+    public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         let actionIdentifier = response.actionIdentifier
         let userInfo = response.notification.request.content.userInfo
         
